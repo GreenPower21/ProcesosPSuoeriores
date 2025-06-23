@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Procesos Psicológicos</title>
+    <!-- Include Font Awesome for star and correct/incorrect icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* CSS variables definition for JSON design colors */
+        :root {
+            --bg-color: #eef2f7;
+            --container-bg: #fff;
+            --text-primary: #222;
+            --text-secondary: #888;
+            --success-color: #18b968;
+            --error-color: #e7515a;
+            --score-color: #0066cc;
+            --star-filled-color: #f8c32b;
+            --border-color: #ddd;
+            --question-section-bg: #f9fbfd;
+            --question-section-border-left: #3498db;
+            --question-section-border-bottom: #cce7f5;
+        }
+
+        /* General body styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0; /* Remove margin for full layout control */
+            padding: 20px; /* Add body padding for space around the container */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            box-sizing: border-box; /* Ensure padding doesn't add to total width */
+            min-height: 100vh; /* Ensure body takes at least full viewport height */
+            display: flex; /* Use flexbox to center content vertically */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Main exam container (Card styling) */
+        .container {
+            width: 100%; /* Container will take full available width */
+            max-width: 900px;
+            margin: 0 auto; /* Center container horizontally */
+            background-color: var(--container-bg);
+            padding: 30px; /* medium padding */
+            border-radius: 16px; /* large border_radius */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* soft box_shadow */
+        }
+
+        /* Main title style (header title) */
+        h1 {
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: bold; /* font_weight: bold */
+        }
+
+        /* Styles for question sections (e.g., Basic Processes) */
+        .question-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: var(--question-section-bg);
+            border-left: 5px solid var(--question-section-border-left);
+            border-radius: 8px;
+        }
+
+        /* Styles for section subtitles (header subtitle) */
+        .question-section h2 {
+            color: var(--question-section-border-left);
+            margin-top: 0;
+            font-size: 1.5em; /* medium font_size */
+            border-bottom: 1px solid var(--question-section-border-bottom);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: normal; /* normal font_weight */
+            color: var(--text-secondary); /* gray color */
+        }
+
+        /* Style for each individual question (card styling for question_item) */
+        .question-item {
+            margin-bottom: 20px;
+            padding: 15px; /* medium padding */
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px; /* large border_radius */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* soft box_shadow */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative; /* For positioning "Show Answer" button */
+        }
+
+        /* Style for question text */
+        .question-item p {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-primary); /* black color */
+            font-size: 1.1em; /* large font_size */
+        }
+
+        /* Style for answer option labels */
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .options label:hover {
+            background-color: #f0f0f0;
+            border-color: #c0c0c0;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        /* Style for feedback (correct/incorrect) */
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+            font-size: 0.95em;
+        }
+
+        /* Style for correct feedback */
+        .feedback.correct {
+            background-color: #d4edda; /* Light green */
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        /* Style for incorrect feedback */
+        .feedback.incorrect {
+            background-color: #f8d7da; /* Light red */
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        /* Class for green border of correct question */
+        .question-item.correct-answered {
+            border-color: var(--success-color);
+            box-shadow: 0 0 15px rgba(24, 185, 104, 0.2); /* Green shadow */
+        }
+
+        /* Class for red border of incorrect question */
+        .question-item.incorrect-answered {
+            border-color: var(--error-color);
+            box-shadow: 0 0 15px rgba(231, 81, 90, 0.2); /* Red shadow */
+        }
+
+        /* Style for buttons */
+        .button {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+            text-align: center; /* Center text in buttons */
+        }
+
+        .submit-button {
+            background-color: #28a745; /* Green for submit button */
+            width: 200px;
+            margin: 30px auto 0;
+        }
+
+        .submit-button:hover {
+            background-color: #218838;
+        }
+
+        .show-answer-button {
+            background-color: #007bff; /* Blue for show answer button */
+            width: auto;
+            padding: 8px 15px;
+            margin-top: 15px; /* Space below options */
+            font-size: 0.9em;
+            float: right; /* Align right */
+            clear: both; /* Clear previous floats */
+        }
+
+        .show-answer-button:hover {
+            background-color: #0056b3;
+        }
+
+        .show-answer-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .reset-button {
+            background-color: #ffc107; /* Yellow for reset button */
+            color: #333;
+            width: 200px;
+            margin: 15px auto 30px; /* Margin to separate from title and form */
+        }
+
+        .reset-button:hover {
+            background-color: #e0a800;
+        }
+
+        /* Area to display final score (footer metrics & score) */
+        #score-area {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--score-color); /* blue color */
+            display: none;
+        }
+
+        #score-area .label { /* label font_weight: medium, color: gray */
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        #score-area .value { /* value font_weight: bold, color: blue */
+            font-weight: bold;
+            color: var(--score-color);
+        }
+
+        #score-display {
+            font-size: 2.5em; /* x-large font_size */
+            color: var(--score-color);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .star {
+            color: var(--star-filled-color); /* yellow icon_color, icon_filled: true */
+            font-size: 0.8em;
+        }
+
+        .correct-answer-display {
+            margin-top: 10px;
+            font-style: italic;
+            color: #007bff;
+            font-size: 0.95em;
+            display: none;
+        }
+
+        /* Styles for review list (list item icon, text, spacing) */
+        #review-list-area {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f0f5fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        #review-list-area h2 {
+            color: var(--error-color); /* Can be red to indicate "to review" */
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--error-color);
+            padding-bottom: 10px;
+        }
+
+        #incorrect-questions-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #incorrect-questions-list li {
+            background-color: var(--container-bg);
+            border: 1px solid var(--error-color);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px; /* small spacing */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #incorrect-questions-list li:hover {
+            background-color: #ffebeb;
+        }
+
+        #incorrect-questions-list li .icon {
+            color: var(--error-color); /* red color_error */
+            font-size: 1.2em;
+        }
+
+        #incorrect-questions-list li .question-text {
+            color: var(--text-primary); /* black color */
+            font-size: 1.0em; /* medium font_size */
+            flex-grow: 1;
+        }
+
+        /* Media Queries for responsiveness */
+        /* For smaller screens (mobile) */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px; /* Less padding on small screens */
+            }
+
+            .container {
+                padding: 20px; /* Reduce inner container padding */
+                margin: 10px auto; /* Adjust margin */
+            }
+
+            h1 {
+                font-size: 1.8em; /* Reduce main title font size */
+            }
+
+            .question-section h2 {
+                font-size: 1.3em; /* Reduce section subtitle font size */
+            }
+
+            .question-item p {
+                font-size: 1em; /* Adjust question text font size */
+            }
+
+            .options label {
+                font-size: 0.9em; /* Adjust option text font size */
+                padding: 10px; /* Increase padding for easier touch on mobile */
+            }
+
+            .submit-button, .reset-button {
+                width: 100%; /* Button takes full width */
+                font-size: 1em;
+            }
+
+            .show-answer-button {
+                width: 100%;
+                float: none; /* Remove float on mobile */
+                margin-top: 10px;
+            }
+
+            #score-area {
+                font-size: 1.1em; /* Adjust score text font size */
+                padding: 15px;
+            }
+
+            #score-display {
+                font-size: 2em; /* Adjust star size */
+            }
+
+            #review-list-area h2 {
+                font-size: 1.2em;
+            }
+
+            #incorrect-questions-list li {
+                font-size: 0.9em; /* Adjust review list text font size */
+                padding: 10px;
+            }
+        }
+
+        /* For even smaller screens (small smartphones) */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+                margin-bottom: 20px;
+            }
+
+            .question-section {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .question-section h2 {
+                font-size: 1.1em;
+                padding-bottom: 8px;
+            }
+
+            .question-item {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .question-item p {
+                font-size: 0.95em;
+            }
+
+            .options label {
+                padding: 10px;
+                margin-bottom: 6px;
+                font-size: 0.85em;
+            }
+
+            .submit-button, .reset-button {
+                padding: 10px 15px;
+                font-size: 0.95em;
+                margin-top: 20px;
+            }
+
+            .show-answer-button {
+                padding: 8px 10px;
+                font-size: 0.8em;
+                margin-top: 8px;
+            }
+
+            #score-area {
+                font-size: 1em;
+                padding: 12px;
+            }
+
+            #score-display {
+                font-size: 1.8em;
+            }
+
+            #review-list-area {
+                padding: 15px;
+                margin-top: 30px;
+            }
+
+            #review-list-area h2 {
+                font-size: 1.1em;
+            }
+
+            #incorrect-questions-list li {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Examen de Procesos Psicológicos</h1>
+        <button type="button" class="button reset-button" id="reset-quiz-button">Reiniciar Examen</button>
+
+        <form id="quiz-form">
+            <!-- Sección 1: Procesos Psicológicos Básicos -->
+            <div class="question-section">
+                <h2>1. Procesos Psicológicos Básicos</h2>
+                <div class="question-item" id="q1-item" data-correct-answer="Son funciones fundamentales del ser humano que procesan información del entorno y de nosotros mismos, como sensación, percepción, memoria, atención, emoción y motivación.">
+                    <p>1. ¿Qué son los procesos psicológicos básicos?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q1" value="Son habilidades avanzadas que se desarrollan solo en individuos con un alto coeficiente intelectual."> Son habilidades avanzadas que se desarrollan únicamente en individuos con un coeficiente intelectual excepcionalmente elevado y requieren de un entrenamiento especializado a lo largo de su vida.</label>
+                        <label><input type="radio" name="q1" value="Son funciones fundamentales del ser humano que procesan información del entorno y de nosotros mismos, como sensación, percepción, memoria, atención, emoción y motivación."> Son funciones fundamentales del ser humano que procesan información del entorno y de nosotros mismos, como sensación, percepción, memoria, atención, emoción y motivación.</label>
+                        <label><input type="radio" name="q1" value="Son únicamente reacciones automáticas del cuerpo ante estímulos físicos externos y carecen de cualquier tipo de componente mental o subjetivo."> Son únicamente reacciones automáticas del cuerpo ante estímulos físicos externos y carecen de cualquier tipo de componente mental o subjetivo que influya en la experiencia individual.</label>
+                        <label><input type="radio" name="q1" value="Se refieren exclusivamente a la capacidad de recordar datos y aprender nueva información, sin incluir aspectos como las emociones o la percepción sensorial."> Se refieren exclusivamente a la capacidad de recordar datos y aprender nueva información, dejando completamente de lado otros aspectos importantes del funcionamiento mental, como las emociones o la percepción sensorial.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Son funciones fundamentales del ser humano que procesan información del entorno y de nosotros mismos, como sensación, percepción, memoria, atención, emoción y motivación.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q1-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q2-item" data-correct-answer="Es el proceso mediante el cual los órganos sensoriales captan y registran información del ambiente a través de estímulos físicos.">
+                    <p>2. ¿En qué consiste la sensación?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q2" value="Es la interpretación subjetiva y significativa de la información captada por los sentidos, otorgándole un sentido personal y elaborando una representación mental."> Es la interpretación subjetiva y significativa de la información captada por los sentidos, otorgándole un sentido personal y elaborando una representación mental compleja y consciente de la realidad externa.</label>
+                        <label><input type="radio" name="q2" value="Consiste en la capacidad de almacenar y evocar experiencias pasadas de forma consciente, permitiendo el recuerdo de eventos y conocimientos previamente adquiridos en el tiempo."> Consiste en la capacidad de almacenar y evocar experiencias pasadas de forma consciente, permitiendo el recuerdo de eventos y conocimientos previamente adquiridos en el tiempo para su uso futuro.</label>
+                        <label><input type="radio" name="q2" value="Es el proceso mediante el cual los órganos sensoriales captan y registran información del ambiente a través de estímulos físicos."> Es el proceso mediante el cual los órganos sensoriales captan y registran información del ambiente a través de estímulos físicos.</label>
+                        <label><input type="radio" name="q2" value="Se refiere a las respuestas psicofisiológicas complejas que experimentamos ante ciertos eventos, como la alegría, tristeza o el miedo, y su manifestación corporal."> Se refiere a las respuestas psicofisiológicas complejas que experimentamos ante ciertos eventos, como la alegría, la tristeza o el miedo, y su manifestación corporal y subjetiva en el organismo.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es el proceso mediante el cual los órganos sensoriales captan y registran información del ambiente a través de estímulos físicos.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q2-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q3-item" data-correct-answer="Es la organización e interpretación de la información sensorial, otorgándole un significado coherente y personal.">
+                    <p>3. ¿Qué es la percepción?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q3" value="Es la recepción pura y simple de estímulos físicos provenientes del entorno inmediato, sin ningún procesamiento o elaboración mental."> Es la recepción pura y simple de estímulos físicos provenientes del entorno inmediato, sin ningún procesamiento o elaboración mental que les otorgue un sentido o un valor significativo.</label>
+                        <label><input type="radio" name="q3" value="Consiste en la capacidad de concentrar el enfoque mental en un solo estímulo particular, ignorando por completo cualquier otra información sensorial irrelevante del ambiente."> Consiste en la capacidad de concentrar el enfoque mental en un solo estímulo particular, ignorando por completo cualquier otra información sensorial irrelevante que pueda estar presente en el ambiente.</label>
+                        <label><input type="radio" name="q3" value="Es la organización e interpretación de la información sensorial, otorgándole un significado coherente y personal."> Es la organización e interpretación de la información sensorial, otorgándole un significado coherente y personal.</label>
+                        <label><input type="radio" name="q3" value="Se relaciona directamente con la habilidad para recordar y almacenar grandes volúmenes de datos en la memoria a largo plazo de forma eficiente y precisa."> Se relaciona directamente con la habilidad para recordar y almacenar grandes volúmenes de datos en la memoria a largo plazo de forma eficiente y precisa para su posterior recuperación.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es la organización e interpretación de la información sensorial, otorgándole un significado coherente y personal.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q3-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q4-item" data-correct-answer="Sirve para codificar, almacenar y recuperar información, lo cual nos permite aprender del pasado y utilizar ese conocimiento en el presente y futuro.">
+                    <p>4. ¿Para qué sirve la memoria?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q4" value="Se utiliza exclusivamente para recordar eventos traumáticos ocurridos durante la niñez, sin ninguna otra función en el procesamiento cotidiano de la información."> Se utiliza exclusivamente para recordar eventos traumáticos ocurridos durante la niñez, sin ninguna otra función relevante en el procesamiento cotidiano de la información y experiencias.</label>
+                        <label><input type="radio" name="q4" value="Sirve para codificar, almacenar y recuperar información, lo cual nos permite aprender del pasado y utilizar ese conocimiento en el presente y futuro."> Sirve para codificar, almacenar y recuperar información, lo cual nos permite aprender del pasado y utilizar ese conocimiento en el presente y futuro.</label>
+                        <label><input type="radio" name="q4" value="Su única función es la adquisición de nuevas habilidades lingüísticas complejas, facilitando el dominio de diferentes idiomas y la comunicación efectiva."> Su única función es la adquisición de nuevas habilidades lingüísticas complejas, facilitando el dominio de diferentes idiomas y mejorando la capacidad de comunicación efectiva entre las personas.</label>
+                        <label><input type="radio" name="q4" value="Permite tomar decisiones de manera impulsiva sin necesidad de un análisis previo o reflexión profunda, basándose únicamente en la intuición del momento."> Permite tomar decisiones de manera impulsiva sin necesidad de un análisis previo o reflexión profunda, basándose únicamente en la intuición o en una reacción inmediata sin deliberación.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Sirve para codificar, almacenar y recuperar información, lo cual nos permite aprender del pasado y utilizar ese conocimiento en el presente y futuro.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q4-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q5-item" data-correct-answer="El aprendizaje depende directamente de la memoria, ya que este es el proceso fundamental para adquirir o modificar información.">
+                    <p>5. ¿Qué relación hay entre memoria y aprendizaje?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q5" value="Son procesos completamente separados e independientes en el funcionamiento cognitivo humano, sin ningún tipo de interacción o influencia mutua."> Son procesos completamente separados e independientes en el funcionamiento cognitivo humano, operando de manera autónoma y sin ningún tipo de interacción o influencia mutua.</label>
+                        <label><input type="radio" name="q5" value="El aprendizaje depende directamente de la memoria, ya que este es el proceso fundamental para adquirir o modificar información."> El aprendizaje depende directamente de la memoria, ya que este es el proceso fundamental para adquirir o modificar información.</label>
+                        <label><input type="radio" name="q5" value="La memoria se encarga solo de almacenar información pasiva, mientras que el aprendizaje es la acción activa de adquirir nuevas habilidades y conocimientos."> La memoria se encarga solo de almacenar información pasiva, sin contribuir activamente al proceso de adquisición, mientras que el aprendizaje es la acción activa de adquirir nuevas habilidades y conocimientos.</label>
+                        <label><input type="radio" name="q5" value="La memoria es considerada una forma avanzada de aprendizaje que ocurre de manera totalmente automática e inconsciente en el cerebro humano."> La memoria es considerada una forma avanzada de aprendizaje que ocurre de manera totalmente automática e inconsciente en el cerebro humano, sin requerir esfuerzo deliberado.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: El aprendizaje depende directamente de la memoria, ya que este es el proceso fundamental para adquirir o modificar información.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q5-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q6-item" data-correct-answer="Son reacciones psicofisiológicas complejas ante estímulos que consideramos significativos, involucrando cambios físicos y una experiencia subjetiva.">
+                    <p>6. ¿Qué es la emoción?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q6" value="Es un estado mental permanente de bienestar y alegría constante en la vida diaria, sin fluctuaciones o variaciones emocionales."> Es un estado mental permanente de bienestar y alegría constante en la vida diaria, caracterizado por una ausencia total de fluctuaciones o variaciones emocionales.</label>
+                        <label><input type="radio" name="q6" value="Son reacciones psicofisiológicas complejas ante estímulos que consideramos significativos, involucrando cambios físicos y una experiencia subjetiva."> Son reacciones psicofisiológicas complejas ante estímulos que consideramos significativos, involucrando cambios físicos y una experiencia subjetiva.</label>
+                        <label><input type="radio" name="q6" value="Se describe únicamente como una respuesta física involuntaria del cuerpo sin ninguna implicación mental o componente psicológico consciente."> Se describe únicamente como una respuesta física involuntaria del cuerpo sin ninguna implicación mental o componente psicológico consciente que le otorgue un significado personal.</label>
+                        <label><input type="radio" name="q6" value="Es simplemente la capacidad innata de los seres humanos para resolver diversos tipos de problemas de forma eficiente y creativa."> Es simplemente la capacidad innata de los seres humanos para resolver diversos tipos de problemas de forma eficiente y creativa, aplicando el razonamiento y la lógica.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Son reacciones psicofisiológicas complejas ante estímulos que consideramos significativos, involucrando cambios físicos y una experiencia subjetiva.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q6-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q7-item" data-correct-answer="Es un proceso mental muy complejo que involucra la manipulación de información, la resolución de problemas, la toma de decisiones, el razonamiento y la creatividad.">
+                    <p>7. ¿Qué es el pensamiento?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q7" value="Se define como una reacción completamente automática e inconsciente a las percepciones sensoriales, sin la intervención de la conciencia o la voluntad."> Se define como una reacción completamente automática e inconsciente a las percepciones sensoriales, ocurriendo sin la intervención de la conciencia o un esfuerzo mental deliberado.</label>
+                        <label><input type="radio" name="q7" value="Es un proceso mental muy complejo que involucra la manipulación de información, la resolución de problemas, la toma de decisiones, el razonamiento y la creatividad."> Es un proceso mental muy complejo que involucra la manipulación de información, la resolución de problemas, la toma de decisiones, el razonamiento y la creatividad.</label>
+                        <label><input type="radio" name="q7" value="Su función principal se limita estrictamente a recordar nombres de personas y fechas importantes, sin ninguna otra aplicación práctica en la vida cotidiana."> Su función principal se limita estrictamente a recordar nombres de personas y fechas importantes, sin ninguna otra aplicación práctica en la resolución de problemas o la toma de decisiones.</label>
+                        <label><input type="radio" name="q7" value="Consiste únicamente en la habilidad de comunicarse verbalmente en diferentes idiomas, sin ninguna relación con la cognición o el análisis de ideas."> Consiste únicamente en la habilidad de comunicarse verbalmente en diferentes idiomas, sin ninguna relación con procesos cognitivos más profundos como la cognición o el análisis de ideas.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es un proceso mental muy complejo que involucra la manipulación de información, la resolución de problemas, la toma de decisiones, el razonamiento y la creatividad.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q7-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q8-item" data-correct-answer="Es la capacidad de enfocar conscientemente la mente en estímulos relevantes e ignorar los irrelevantes; es un proceso selectivo y limitado.">
+                    <p>8. ¿Qué es la atención?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q8" value="Es la habilidad de realizar múltiples tareas simultáneamente sin ningún esfuerzo aparente, demostrando una capacidad ilimitada de procesamiento."> Es la habilidad de realizar múltiples tareas simultáneamente sin ningún esfuerzo aparente, lo que implicaría una capacidad ilimitada de procesamiento de información en el cerebro.</label>
+                        <label><input type="radio" name="q8" value="Se considera simplemente la memoria de corto plazo, donde la información se retiene brevemente antes de ser olvidada por completo."> Se considera simplemente la memoria de corto plazo, un sistema donde la información se retiene de forma temporal antes de ser olvidada o transferida a la memoria a largo plazo.</label>
+                        <label><input type="radio" name="q8" value="Es la capacidad de enfocar conscientemente la mente en estímulos relevantes e ignorar los irrelevantes; es un proceso selectivo y limitado."> Es la capacidad de enfocar conscientemente la mente en estímulos relevantes e ignorar los irrelevantes; es un proceso selectivo y limitado.</label>
+                        <label><input type="radio" name="q8" value="Su alcance se restringe exclusivamente a la concentración necesaria para leer libros, sin aplicarse a otras actividades cotidianas."> Su alcance se restringe exclusivamente a la concentración necesaria para leer libros, excluyendo su aplicación en otras actividades cotidianas que requieran focalización mental.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es la capacidad de enfocar conscientemente la mente en estímulos relevantes e ignorar los irrelevantes; es un proceso selectivo y limitado.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q8-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q9-item" data-correct-answer="Porque se considera la capacidad general que permite entender, aprender y resolver problemas de diversa índole de manera efectiva.">
+                    <p>9. ¿Por qué algunos autores incluyen la inteligencia como proceso básico?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q9" value="Debido a que es la única habilidad que posibilita el desarrollo de la creatividad humana en su máxima expresión, sin influencias de otros procesos."> Debido a que es la única habilidad que posibilita el desarrollo de la creatividad humana en su máxima expresión, sin la influencia o interacción de otros procesos cognitivos o básicos.</label>
+                        <label><input type="radio" name="q9" value="Solo se le clasifica como básica si puede ser medida y cuantificada a través de un test estandarizado, que valide su existencia y nivel."> Solo se le clasifica como básica si puede ser medida y cuantificada a través de un test estandarizado, un requisito indispensable para validar su existencia y determinar su nivel.</label>
+                        <label><input type="radio" name="q9" value="Porque se considera la capacidad general que permite entender, aprender y resolver problemas de diversa índole de manera efectiva."> Porque se considera la capacidad general que permite entender, aprender y resolver problemas de diversa índole de manera efectiva.</label>
+                        <label><input type="radio" name="q9" value="Puesto que no tiene ninguna conexión o influencia con el desarrollo del lenguaje verbal, operando de forma completamente independiente de la comunicación."> Puesto que no tiene ninguna conexión o influencia con el desarrollo del lenguaje verbal, lo que implica que la inteligencia opera de forma completamente independiente de la comunicación lingüística.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Porque se considera la capacidad general que permite entender, aprender y resolver problemas de diversa índole de manera efectiva.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q9-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 2: Relación entre procesos psicológicos básicos y superiores -->
+            <div class="question-section">
+                <h2>2. Relación entre procesos psicológicos básicos y superiores</h2>
+                <div class="question-item" id="q10-item" data-correct-answer="Los procesos psicológicos superiores, como el pensamiento, el lenguaje y la inteligencia, se desarrollan a partir de la base de los procesos básicos, como la sensación, percepción, atención y memoria.">
+                    <p>10. ¿Cómo se relacionan los procesos psicológicos básicos y superiores?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q10" value="No poseen ninguna conexión significativa entre sí, operando de manera completamente independiente y sin influenciarse mutuamente en ningún momento."> No poseen ninguna conexión significativa entre sí, operando de manera completamente independiente y sin influenciarse mutuamente en ningún momento de la actividad cognitiva humana.</label>
+                        <label><input type="radio" name="q10" value="Los procesos psicológicos superiores, como el pensamiento, el lenguaje y la inteligencia, se desarrollan a partir de la base de los procesos básicos, como la sensación, percepción, atención y memoria."> Los procesos psicológicos superiores, como el pensamiento, el lenguaje y la inteligencia, se desarrollan a partir de la base de los procesos básicos, como la sensación, percepción, atención y memoria.</label>
+                        <label><input type="radio" name="q10" value="Los procesos básicos son inherentemente más complejos y evolucionados que los procesos superiores, representando una etapa más avanzada del desarrollo cognitivo."> Los procesos básicos son inherentemente más complejos y evolucionados que los procesos superiores, representando una etapa más avanzada y sofisticada del desarrollo cognitivo humano.</label>
+                        <label><input type="radio" name="q10" value="Únicamente los procesos superiores tienen un impacto y afectan el funcionamiento de los procesos básicos, sin que ocurra una influencia en la dirección inversa."> Únicamente los procesos superiores tienen un impacto y afectan el funcionamiento de los procesos básicos, lo que significa que la influencia es unidireccional y no existe una relación recíproca.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Los procesos psicológicos superiores, como el pensamiento, el lenguaje y la inteligencia, se desarrollan a partir de la base de los procesos básicos, como la sensación, percepción, atención y memoria.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q10-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q11-item" data-correct-answer="Porque los procesos básicos constituyen la plataforma fundamental para que se asienten los superiores, y estos últimos, a su vez, influyen y dirigen a los básicos.">
+                    <p>11. ¿Por qué la relación es jerárquica y de interdependencia?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q11" value="Debido a que cada proceso actúa de forma aislada y no influye en los demás en ningún momento, manteniendo su autonomía total."> Debido a que cada proceso actúa de forma aislada y no influye en los demás en ningún momento, lo que garantiza su independencia y autonomía total dentro del sistema cognitivo.</label>
+                        <label><input type="radio" name="q11" value="Esta relación solo se manifiesta en individuos que poseen una inteligencia muy desarrollada y un alto nivel de educación formal."> Esta relación solo se manifiesta en individuos que poseen una inteligencia muy desarrollada y un alto nivel de educación formal, siendo ausente en otras personas.</label>
+                        <label><input type="radio" name="q11" value="Porque los procesos básicos constituyen la plataforma fundamental para que se asienten los superiores, y estos últimos, a su vez, influyen y dirigen a los básicos."> Porque los procesos básicos constituyen la plataforma fundamental para que se asienten los superiores, y estos últimos, a su vez, influyen y dirigen a los básicos.</label>
+                        <label><input type="radio" name="q11" value="No pueden ser objeto de estudio conjunto, ya que pertenecen a categorías psicológicas completamente diferentes y sin puntos de conexión."> No pueden ser objeto de estudio conjunto, ya que pertenecen a categorías psicológicas completamente diferentes y carecen de puntos de conexión o interacción mutua.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Porque los procesos básicos constituyen la plataforma fundamental para que se asienten los superiores, y estos últimos, a su vez, influyen y dirigen a los básicos.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q11-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q12-item" data-correct-answer="Al leer un texto, percibimos visualmente las letras (percepción), nos concentramos en el contenido (atención), recordamos las palabras (memoria) y finalmente comprendemos las ideas (pensamiento).">
+                    <p>12. Ejemplo de interacción entre procesos básicos y superiores:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q12" value="Funciones biológicas automáticas como el proceso de respirar o el latido del corazón, que son reguladas por el sistema nervioso autónomo."> Funciones biológicas automáticas como el proceso de respirar o el latido del corazón, las cuales son reguladas por el sistema nervioso autónomo sin intervención consciente.</label>
+                        <label><input type="radio" name="q12" value="Al leer un texto, percibimos visualmente las letras (percepción), nos concentramos en el contenido (atención), recordamos las palabras (memoria) y finalmente comprendemos las ideas (pensamiento)."> Al leer un texto, percibimos visualmente las letras (percepción), nos concentramos en el contenido (atención), recordamos las palabras (memoria) y finalmente comprendemos las ideas (pensamiento).</label>
+                        <label><input type="radio" name="q12" value="Actividades fisiológicas como dormir durante la noche o experimentar sueños de forma inconsciente, sin implicar una actividad cognitiva compleja."> Actividades fisiológicas como dormir durante la noche o experimentar sueños de forma inconsciente, sin implicar una actividad cognitiva compleja o un procesamiento mental elaborado.</label>
+                        <label><input type="radio" name="q12" value="Manifestaciones básicas de necesidades biológicas, por ejemplo, sentir la necesidad de comer cuando se tiene hambre o beber agua cuando se experimenta sed intensa."> Manifestaciones básicas de necesidades biológicas, por ejemplo, sentir la necesidad de comer cuando se tiene hambre o beber agua cuando se experimenta sed intensa y urgente.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Al leer un texto, percibimos visualmente las letras (percepción), nos concentramos en el contenido (atención), recordamos las palabras (memoria) y finalmente comprendemos las ideas (pensamiento).</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q12-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 3: Procesos Psicológicos Superiores -->
+            <div class="question-section">
+                <h2>3. Procesos Psicológicos Superiores</h2>
+                <div class="question-item" id="q13-item" data-correct-answer="Son funciones mentales más complejas, conscientes y voluntarias, con una notable influencia sociocultural. Incluyen pensamiento, lenguaje, memoria voluntaria, atención selectiva y dividida, funciones ejecutivas e inteligencia.">
+                    <p>13. ¿Qué son los procesos psicológicos superiores?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q13" value="Son procesos cognitivos que se manifiestan exclusivamente durante las primeras etapas de la infancia y luego desaparecen con el desarrollo adulto."> Son procesos cognitivos que se manifiestan exclusivamente durante las primeras etapas de la infancia y que, posteriormente, disminuyen o desaparecen por completo con el desarrollo adulto.</label>
+                        <label><input type="radio" name="q13" value="Son funciones mentales más complejas, conscientes y voluntarias, con una notable influencia sociocultural. Incluyen pensamiento, lenguaje, memoria voluntaria, atención selectiva y dividida, funciones ejecutivas e inteligencia."> Son funciones mentales más complejas, conscientes y voluntarias, con una notable influencia sociocultural. Incluyen pensamiento, lenguaje, memoria voluntaria, atención selectiva y dividida, funciones ejecutivas e inteligencia.</label>
+                        <label><input type="radio" name="q13" value="Representan las reacciones instintivas y automáticas del cuerpo ante diversos estímulos externos, sin que exista un control consciente sobre ellas."> Representan las reacciones instintivas y automáticas del cuerpo ante diversos estímulos externos, sobre las cuales el individuo no ejerce ningún tipo de control consciente o deliberado.</label>
+                        <label><input type="radio" name="q13" value="Se limitan estrictamente a los sistemas biológicos básicos como la regulación de la respiración o el pulso cardíaco, sin implicar funciones mentales complejas."> Se limitan estrictamente a los sistemas biológicos básicos como la regulación de la respiración o el pulso cardíaco, sin implicar funciones mentales complejas que requieran un procesamiento cognitivo elevado.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Son funciones mentales más complejas, conscientes y voluntarias, con una notable influencia sociocultural. Incluyen pensamiento, lenguaje, memoria voluntaria, atención selectiva y dividida, funciones ejecutivas e inteligencia.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q13-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 4: Pensamiento como proceso psicológico superior -->
+            <div class="question-section">
+                <h2>4. Pensamiento como proceso psicológico superior</h2>
+                <div class="question-item" id="q14-item" data-correct-answer="Se considera un proceso superior porque implica la organización y manipulación interna de la información, desarrollándose a partir de los procesos psicológicos básicos.">
+                    <p>14. ¿Por qué el pensamiento se considera un proceso superior?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q14" value="Se clasifica como tal debido a que es un proceso completamente automático e independiente de la voluntad humana, sin requerir ningún esfuerzo consciente."> Se clasifica como tal debido a que es un proceso completamente automático e independiente de la voluntad humana, lo que significa que ocurre sin requerir ningún esfuerzo consciente.</label>
+                        <label><input type="radio" name="q14" value="Se considera un proceso superior porque implica la organización y manipulación interna de la información, desarrollándose a partir de los procesos psicológicos básicos."> Se considera un proceso superior porque implica la organización y manipulación interna de la información, desarrollándose a partir de los procesos psicológicos básicos.</label>
+                        <label><input type="radio" name="q14" value="Su naturaleza superior reside en que solo puede ser ejercitado por personas con un nivel educativo muy avanzado y una gran capacidad de abstracción teórica."> Su naturaleza superior reside en que solo puede ser ejercitado por personas con un nivel educativo muy avanzado y una gran capacidad de abstracción teórica.</label>
+                        <label><input type="radio" name="q14" value="Es un proceso superior porque su origen y función están intrínsecamente ligados a las funciones corporales básicas y los reflejos biológicos innatos."> Es un proceso superior porque su origen y función están intrínsecamente ligados a las funciones corporales básicas y los reflejos biológicos innatos del organismo humano.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Se considera un proceso superior porque implica la organización y manipulación interna de la información, desarrollándose a partir de los procesos psicológicos básicos.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q14-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q15-item" data-correct-answer="Es abstracto, se dirige a objetivos, soluciona problemas, permite tomar decisiones, fomenta la creatividad, implica razonamiento lógico, se relaciona con el lenguaje y conlleva metacognición (reflexión sobre el propio pensamiento).">
+                    <p>15. ¿Cuáles son las características del pensamiento como proceso superior?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q15" value="Se caracteriza por ser un proceso automático, rígido e inflexible, que aparece únicamente en situaciones de gran estrés o presión extrema."> Se caracteriza por ser un proceso automático, rígido e inflexible, que aparece únicamente en situaciones de gran estrés o presión extrema, sin adaptación.</label>
+                        <label><input type="radio" name="q15" value="Su única característica relevante es la capacidad de enfocar y memorizar grandes cantidades de datos e información, sin implicar un procesamiento más profundo."> Su única característica relevante es la capacidad de enfocar y memorizar grandes cantidades de datos e información, sin implicar un procesamiento más profundo o analítico.</label>
+                        <label><input type="radio" name="q15" value="Es abstracto, se dirige a objetivos, soluciona problemas, permite tomar decisiones, fomenta la creatividad, implica razonamiento lógico, se relaciona con el lenguaje y conlleva metacognición (reflexión sobre el propio pensamiento)."> Es abstracto, se dirige a objetivos, soluciona problemas, permite tomar decisiones, fomenta la creatividad, implica razonamiento lógico, se relaciona con el lenguaje y conlleva metacognición (reflexión sobre el propio pensamiento).</label>
+                        <label><input type="radio" name="q15" value="No requiere de la habilidad del lenguaje ni de la capacidad creativa para su correcto funcionamiento, ya que opera de forma puramente mecánica."> No requiere de la habilidad del lenguaje ni de la capacidad creativa para su correcto funcionamiento, ya que opera de forma puramente mecánica e independiente.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es abstracto, se dirige a objetivos, soluciona problemas, permite tomar decisiones, fomenta la creatividad, implica razonamiento lógico, se relaciona con el lenguaje y conlleva metacognición (reflexión sobre el propio pensamiento).</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q15-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q16-item" data-correct-answer="Ejemplos incluyen resolver un acertijo complejo, planificar detalladamente un viaje, escribir un ensayo argumentativo, diagnosticar una enfermedad, crear arte original o aprender un nuevo idioma.">
+                    <p>16. Ejemplo de pensamiento superior:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q16" value="La acción involuntaria de parpadear como respuesta a una luz intensa o un estímulo repentino, lo cual es un reflejo básico del cuerpo."> La acción involuntaria de parpadear como respuesta a una luz intensa o un estímulo repentino, siendo este un reflejo básico del cuerpo sin implicación de pensamiento complejo.</label>
+                        <label><input type="radio" name="q16" value="Experimentar una sensación fisiológica básica como la sed que indica la necesidad de beber líquidos para mantener la homeostasis corporal."> Experimentar una sensación fisiológica básica como la sed que indica la necesidad de beber líquidos para mantener la homeostasis corporal, sin procesamiento cognitivo superior.</label>
+                        <label><input type="radio" name="q16" value="Ejemplos incluyen resolver un acertijo complejo, planificar detalladamente un viaje, escribir un ensayo argumentativo, diagnosticar una enfermedad, crear arte original o aprender un nuevo idioma."> Ejemplos incluyen resolver un acertijo complejo, planificar detalladamente un viaje, escribir un ensayo argumentativo, diagnosticar una enfermedad, crear arte original o aprender un nuevo idioma.</label>
+                        <label><input type="radio" name="q16" value="Un reflejo simple como girar la cabeza automáticamente al escuchar un sonido inesperado, sin análisis o deliberación consciente."> Un reflejo simple como girar la cabeza automáticamente al escuchar un sonido inesperado, manifestándose sin ningún análisis o deliberación consciente del estímulo.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos incluyen resolver un acertijo complejo, planificar detalladamente un viaje, escribir un ensayo argumentativo, diagnosticar una enfermedad, crear arte original o aprender un nuevo idioma.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q16-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 5: Lenguaje como proceso psicológico superior -->
+            <div class="question-section">
+                <h2>5. Lenguaje como proceso psicológico superior</h2>
+                <div class="question-item" id="q17-item" data-correct-answer="Es una herramienta cognitiva fundamental para comunicar pensamientos, sentimientos y experiencias mediante un sistema simbólico complejo y estructurado.">
+                    <p>17. ¿Qué es el lenguaje como proceso superior?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q17" value="Se limita a la mera capacidad de emitir sonidos articulados o vocalizaciones de cualquier tipo, sin implicar un significado profundo."> Se limita a la mera capacidad de emitir sonidos articulados o vocalizaciones de cualquier tipo, sin implicar un significado profundo o una intención comunicativa compleja.</label>
+                        <label><input type="radio" name="q17" value="Es un proceso completamente automático e inconsciente que carece de cualquier tipo de significado inherente o propósito comunicativo."> Es un proceso completamente automático e inconsciente que carece de cualquier tipo de significado inherente o propósito comunicativo en la interacción humana.</label>
+                        <label><input type="radio" name="q17" value="Es una herramienta cognitiva fundamental para comunicar pensamientos, sentimientos y experiencias mediante un sistema simbólico complejo y estructurado."> Es una herramienta cognitiva fundamental para comunicar pensamientos, sentimientos y experiencias mediante un sistema simbólico complejo y estructurado.</label>
+                        <label><input type="radio" name="q17" value="Se refiere exclusivamente a la forma escrita de comunicación y a la habilidad de transcribir palabras en un texto, sin abarcar la expresión oral."> Se refiere exclusivamente a la forma escrita de comunicación y a la habilidad de transcribir palabras en un texto, sin abarcar la expresión oral o no verbal.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es una herramienta cognitiva fundamental para comunicar pensamientos, sentimientos y experiencias mediante un sistema simbólico complejo y estructurado.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q17-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q18-item" data-correct-answer="Posee función simbólica, arbitrariedad y convencionalidad, productividad (creación infinita de mensajes), desplazamiento (hablar de lo no presente), transmisión cultural, una estructura compleja con reglas y niveles, y es una herramienta esencial del pensamiento.">
+                    <p>18. Características del lenguaje como proceso superior:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q18" value="Es un sistema rígido y estático que no permite la creación de nuevos mensajes o expresiones, limitándose a un repertorio fijo."> Es un sistema rígido y estático que no permite la creación de nuevos mensajes o expresiones, lo que significa que su repertorio es fijo e inmutable.</label>
+                        <label><input type="radio" name="q18" value="Su única utilidad es la descripción literal de lo que percibimos visualmente en nuestro entorno inmediato, sin capacidad de abstracción."> Su única utilidad es la descripción literal de lo que percibimos visualmente en nuestro entorno inmediato, sin ninguna capacidad de abstracción o representación de ideas. </label>
+                        <label><input type="radio" name="q18" value="Posee función simbólica, arbitrariedad y convencionalidad, productividad (creación infinita de mensajes), desplazamiento (hablar de lo no presente), transmisión cultural, una estructura compleja con reglas y niveles, y es una herramienta esencial del pensamiento."> Posee función simbólica, arbitrariedad y convencionalidad, productividad (creación infinita de mensajes), desplazamiento (hablar de lo no presente), transmisión cultural, una estructura compleja con reglas y niveles, y es una herramienta esencial del pensamiento.</label>
+                        <label><input type="radio" name="q18" value="No tiene ninguna conexión o influencia con los aspectos culturales y las interacciones sociales, desarrollándose de forma aislada."> No tiene ninguna conexión o influencia con los aspectos culturales y las interacciones sociales, lo que significa que su desarrollo ocurre de forma aislada.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Posee función simbólica, arbitrariedad y convencionalidad, productividad (creación infinita de mensajes), desplazamiento (hablar de lo no presente), transmisión cultural, una estructura compleja con reglas y niveles, y es una herramienta esencial del pensamiento.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q18-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q19-item" data-correct-answer="Ejemplos incluyen mantener una conversación fluida, leer y comprender textos complejos, escribir un correo electrónico formal, explicar un concepto abstracto, contar una historia imaginaria, comprender el sarcasmo o aprender un nuevo idioma.">
+                    <p>19. Ejemplo de uso del lenguaje superior:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q19" value="Emitir un grito espontáneo de dolor o de sorpresa, lo cual es una reacción vocal básica y no un uso del lenguaje complejo."> Emitir un grito espontáneo de dolor o de sorpresa, lo cual es una reacción vocal básica y no constituye un uso del lenguaje complejo o simbólico.</label>
+                        <label><input type="radio" name="q19" value="Manifestar una risa fuerte y prolongada en respuesta a algo gracioso, que es una expresión emocional y no un acto lingüístico."> Manifestar una risa fuerte y prolongada en respuesta a algo gracioso, lo cual representa una expresión emocional espontánea y no un acto lingüístico intencionado.</label>
+                        <label><input type="radio" name="q19" value="Ejemplos incluyen mantener una conversación fluida, leer y comprender textos complejos, escribir un correo electrónico formal, explicar un concepto abstracto, contar una historia imaginaria, comprender el sarcasmo o aprender un nuevo idioma."> Ejemplos incluyen mantener una conversación fluida, leer y comprender textos complejos, escribir un correo electrónico formal, explicar un concepto abstracto, contar una historia imaginaria, comprender el sarcasmo o aprender un nuevo idioma.</label>
+                        <label><input type="radio" name="q19" value="Un acto reflejo como estornudar debido a una irritación en las fosas nasales, lo cual es una respuesta fisiológica incontrolable."> Un acto reflejo como estornudar debido a una irritación en las fosas nasales, siendo una respuesta fisiológica incontrolable del cuerpo y no una manifestación del lenguaje.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos incluyen mantener una conversación fluida, leer y comprender textos complejos, escribir un correo electrónico formal, explicar un concepto abstracto, contar una historia imaginaria, comprender el sarcasmo o aprender un nuevo idioma.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q19-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 6: Memoria voluntaria como proceso psicológico superior -->
+            <div class="question-section">
+                <h2>6. Memoria voluntaria como proceso psicológico superior</h2>
+                <div class="question-item" id="q20-item" data-correct-answer="Es la capacidad consciente y deliberada de recordar información, lo cual la diferencia de la memoria automática o involuntaria.">
+                    <p>20. ¿Qué es la memoria voluntaria?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q20" value="Se refiere al acto de recordar algo sin aplicar ningún tipo de esfuerzo o intención consciente, produciéndose de forma espontánea."> Se refiere al acto de recordar algo sin aplicar ningún tipo de esfuerzo o intención consciente, por lo que la recuperación de la información se produce de forma espontánea.</label>
+                        <label><input type="radio" name="q20" value="Es una forma específica de memoria que se manifiesta exclusivamente durante el estado de los sueños, sin operar en la vigilia."> Es una forma específica de memoria que se manifiesta exclusivamente durante el estado de los sueños, siendo inactiva o irrelevante durante el estado de vigilia.</label>
+                        <label><input type="radio" name="q20" value="Es la capacidad consciente y deliberada de recordar información, lo cual la diferencia de la memoria automática o involuntaria."> Es la capacidad consciente y deliberada de recordar información, lo cual la diferencia de la memoria automática o involuntaria.</label>
+                        <label><input type="radio" name="q20" value="Su alcance se limita solamente a la memorización de fechas importantes en la historia mundial, sin incluir experiencias personales."> Su alcance se limita solamente a la memorización de fechas importantes en la historia mundial, excluyendo por completo la retención de experiencias personales o conocimientos generales.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es la capacidad consciente y deliberada de recordar información, lo cual la diferencia de la memoria automática o involuntaria.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q20-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q21-item" data-correct-answer="Sus características incluyen conciencia, esfuerzo, control, flexibilidad, organización e influencia directa de la motivación personal.">
+                    <p>21. Características de la memoria voluntaria:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q21" value="Se distingue por ser un proceso siempre involuntario y que no requiere de ningún esfuerzo mental consciente o deliberado por parte del individuo."> Se distingue por ser un proceso siempre involuntario y que no requiere de ningún esfuerzo mental consciente o deliberado por parte del individuo para recuperar recuerdos.</label>
+                        <label><input type="radio" name="q21" value="Es un sistema rígido e inflexible que no permite ningún tipo de organización interna de los recuerdos, impidiendo su adaptación."> Es un sistema rígido e inflexible que no permite ningún tipo de organización interna de los recuerdos, lo que limita significativamente su capacidad de adaptación.</label>
+                        <label><input type="radio" name="q21" value="Sus características incluyen conciencia, esfuerzo, control, flexibilidad, organización e influencia directa de la motivación personal."> Sus características incluyen conciencia, esfuerzo, control, flexibilidad, organización e influencia directa de la motivación personal.</label>
+                        <label><input type="radio" name="q21" value="No es influenciada de ninguna manera por el nivel de motivación o el interés individual, operando de forma autónoma."> No es influenciada de ninguna manera por el nivel de motivación o el interés individual, lo que significa que opera de forma autónoma.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Sus características incluyen conciencia, esfuerzo, control, flexibilidad, organización e influencia directa de la motivación personal.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q21-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q22-item" data-correct-answer="Existen la memoria episódica (para experiencias personales y eventos específicos) y la memoria semántica (para el conocimiento general y los hechos).">
+                    <p>22. ¿Qué tipos de memoria voluntaria existen?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q22" value="Se clasifican en memoria de corto plazo y memoria de largo plazo según su duración y la capacidad de retención de la información."> Se clasifican en memoria de corto plazo y memoria de largo plazo, diferenciándose principalmente por su duración y la capacidad de retención de la información.</label>
+                        <label><input type="radio" name="q22" value="Se conocen como memoria muscular (de habilidades motoras aprendidas) y memoria sensorial (de los sentidos, breve y automática)."> Se conocen como memoria muscular, referida a habilidades motoras aprendidas, y memoria sensorial, que es breve y automática, ligada a los sentidos.</label>
+                        <label><input type="radio" name="q22" value="Existen la memoria episódica (para experiencias personales y eventos específicos) y la memoria semántica (para el conocimiento general y los hechos)."> Existen la memoria episódica (para experiencias personales y eventos específicos) y la memoria semántica (para el conocimiento general y los hechos).</label>
+                        <label><input type="radio" name="q22" value="Se dividen en memoria de trabajo (para tareas actuales y procesamiento activo) y memoria procedimental (para habilidades y procedimientos automáticos)."> Se dividen en memoria de trabajo, utilizada para tareas actuales y procesamiento activo, y memoria procedimental, que se refiere a habilidades y procedimientos automáticos.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Existen la memoria episódica (para experiencias personales y eventos específicos) y la memoria semántica (para el conocimiento general y los hechos).</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q22-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q23-item" data-correct-answer="Los procesos clave que intervienen en la memoria voluntaria son la codificación (ingreso), el almacenamiento (retención) y la recuperación (acceso) de la información.">
+                    <p>23. ¿Qué otros procesos clave intervienen en la memoria voluntaria?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q23" value="Principalmente la percepción (interpretación de estímulos sensoriales) y la sensación (recepción de estímulos), que son procesos previos a la memoria."> Principalmente la percepción, que implica la interpretación de estímulos sensoriales, y la sensación, que es la mera recepción de estos, ambos procesos previos a la memoria.</label>
+                        <label><input type="radio" name="q23" value="Fundamentalmente la atención (enfoque selectivo de la conciencia) y la motivación (impulso hacia metas específicas)."> Fundamentalmente la atención, que se refiere al enfoque selectivo de la conciencia, y la motivación, que actúa como un impulso hacia metas específicas y deseadas.</label>
+                        <label><input type="radio" name="q23" value="Los procesos clave que intervienen en la memoria voluntaria son la codificación (ingreso), el almacenamiento (retención) y la recuperación (acceso) de la información."> Los procesos clave que intervienen en la memoria voluntaria son la codificación (ingreso), el almacenamiento (retención) y la recuperación (acceso) de la información.</label>
+                        <label><input type="radio" name="q23" value="Se relacionan la emoción (reacciones psicofisiológicas y subjetivas) y el lenguaje (sistema de comunicación simbólica)."> Se relacionan la emoción, que involucra reacciones psicofisiológicas y subjetivas, y el lenguaje, que es un sistema de comunicación simbólica complejo y estructurado.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Los procesos clave que intervienen en la memoria voluntaria son la codificación (ingreso), el almacenamiento (retención) y la recuperación (acceso) de la información.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q23-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 7: Atención Selectiva y Atención Dividida -->
+            <div class="question-section">
+                <h2>7. Atención Selectiva y Atención Dividida</h2>
+                <div class="question-item" id="q24-item" data-correct-answer="Es la habilidad de enfocar la concentración mental en un estímulo o tarea relevante, mientras se ignoran los elementos distractores.">
+                    <p>24. ¿Qué es la atención selectiva?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q24" value="Se define como la capacidad de procesar múltiples informaciones o tareas de forma simultánea, sin que disminuya la eficiencia."> Se define como la capacidad de procesar múltiples informaciones o tareas de forma simultánea, manteniendo la eficiencia en todas ellas sin esfuerzo aparente.</label>
+                        <label><input type="radio" name="q24" value="Es una reacción automática e inconsciente del organismo ante la presencia de estímulos, sin que exista control voluntario sobre ella."> Es una reacción automática e inconsciente del organismo ante la presencia de estímulos, lo cual significa que no hay control voluntario sobre este proceso.</label>
+                        <label><input type="radio" name="q24" value="Es la habilidad de enfocar la concentración mental en un estímulo o tarea relevante, mientras se ignoran los elementos distractores."> Es la habilidad de enfocar la concentración mental en un estímulo o tarea relevante, mientras se ignoran los elementos distractores.</label>
+                        <label><input type="radio" name="q24" value="Su significado se limita a la capacidad de recordar visualmente imágenes y escenas con gran detalle, como una memoria fotográfica."> Su significado se limita a la capacidad de recordar visualmente imágenes y escenas con gran detalle, funcionando como una memoria fotográfica muy precisa.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es la habilidad de enfocar la concentración mental en un estímulo o tarea relevante, mientras se ignoran los elementos distractores.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q24-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q25-item" data-correct-answer="Ejemplos son leer un libro en una cafetería ruidosa, seguir una conversación en una fiesta concurrida, conducir un automóvil o estudiar ignorando el celular.">
+                    <p>25. Ejemplo de atención selectiva:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q25" value="Realizar la acción de caminar mientras se sostiene una conversación telefónica, combinando ambas tareas con éxito."> Realizar la acción de caminar mientras se sostiene una conversación telefónica, logrando combinar ambas tareas con éxito y sin perder el hilo de ninguna.</label>
+                        <label><input type="radio" name="q25" value="Preparar alimentos en la cocina al mismo tiempo que se escucha un programa en la radio, demostrando habilidad multitarea."> Preparar alimentos en la cocina al mismo tiempo que se escucha un programa en la radio, lo que demuestra una habilidad multitarea eficaz y sin interrupciones.</label>
+                        <label><input type="radio" name="q25" value="Ejemplos son leer un libro en una cafetería ruidosa, seguir una conversación en una fiesta concurrida, conducir un automóvil o estudiar ignorando el celular."> Ejemplos son leer un libro en una cafetería ruidosa, seguir una conversación en una fiesta concurrida, conducir un automóvil o estudiar ignorando el celular.</label>
+                        <label><input type="radio" name="q25" value="El acto de soñar despierto, lo cual implica divagar mentalmente sin un enfoque claro en la realidad presente."> El acto de soñar despierto, lo cual implica divagar mentalmente sin un enfoque claro en la realidad presente, dejando que los pensamientos fluyan libremente.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos son leer un libro en una cafetería ruidosa, seguir una conversación en una fiesta concurrida, conducir un automóvil o estudiar ignorando el celular.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q25-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q26-item" data-correct-answer="Es la habilidad de distribuir el foco atencional para procesar y responder a dos o más estímulos o tareas simultáneamente.">
+                    <p>26. ¿Qué es la atención dividida?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q26" value="Representa la completa incapacidad de una persona para mantener la concentración mental en una tarea durante un período prolongado."> Representa la completa incapacidad de una persona para mantener la concentración mental en una tarea durante un período prolongado, lo que dificulta el aprendizaje.</label>
+                        <label><input type="radio" name="q26" value="Se define como la habilidad de ignorar por completo todos los estímulos del entorno, logrando un estado de aislamiento sensorial total."> Se define como la habilidad de ignorar por completo todos los estímulos del entorno, lo que permite un estado de aislamiento sensorial total y profundo.</label>
+                        <label><input type="radio" name="q26" value="Es la habilidad de distribuir el foco atencional para procesar y responder a dos o más estímulos o tareas simultáneamente."> Es la habilidad de distribuir el foco atencional para procesar y responder a dos o más estímulos o tareas simultáneamente.</label>
+                        <label><input type="radio" name="q26" value="Se refiere exclusivamente a la concentración intensa en un único objeto o punto fijo, sin considerar ningún otro elemento."> Se refiere exclusivamente a la concentración intensa en un único objeto o punto fijo, excluyendo por completo la percepción de cualquier otro elemento circundante.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es la habilidad de distribuir el foco atencional para procesar y responder a dos o más estímulos o tareas simultáneamente.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q26-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q27-item" data-correct-answer="Un ejemplo es cocinar mientras se escucha la radio, hablar por teléfono y caminar, tomar apuntes mientras se atiende al profesor o conducir y conversar.">
+                    <p>27. Ejemplo de atención dividida:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q27" value="Actividades como leer un libro en un ambiente de total silencio y sin interrupciones, donde la concentración es plena."> Actividades como leer un libro en un ambiente de total silencio y sin interrupciones, lo cual permite una concentración mental plena y profunda en la lectura.</label>
+                        <label><input type="radio" name="q27" value="Un ejemplo es cocinar mientras se escucha la radio, hablar por teléfono y caminar, tomar apuntes mientras se atiende al profesor o conducir y conversar."> Un ejemplo es cocinar mientras se escucha la radio, hablar por teléfono y caminar, tomar apuntes mientras se atiende al profesor o conducir y conversar.</label>
+                        <label><input type="radio" name="q27" value="La acción de concentrar toda la energía mental en un solo objeto de estudio o visualización, sin desviarse hacia otros estímulos."> La acción de concentrar toda la energía mental en un solo objeto de estudio o visualización, manteniendo un enfoque absoluto sin desviarse hacia otros estímulos.</label>
+                        <label><input type="radio" name="q27" value="Estar en un estado de sueño profundo, donde no hay conciencia ni procesamiento activo de información, solo descanso."> Estar en un estado de sueño profundo, donde no hay conciencia ni procesamiento activo de información, lo que implica un estado de completo descanso para el cerebro.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Un ejemplo es cocinar mientras se escucha la radio, hablar por teléfono y caminar, tomar apuntes mientras se atiende al profesor o conducir y conversar.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q27-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q28-item" data-correct-answer="La atención selectiva filtra y se concentra en un único estímulo, mientras que la dividida distribuye el foco atencional entre varios estímulos o tareas simultáneas.">
+                    <p>28. Diferencia clave entre atención selectiva y dividida:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q28" value="Son procesos cognitivos idénticos, diferenciándose únicamente en la terminología utilizada para describirlos, sin una distinción real."> Son procesos cognitivos idénticos, diferenciándose únicamente en la terminología utilizada para describirlos, lo que sugiere que no hay una distinción real en su funcionamiento.</label>
+                        <label><input type="radio" name="q28" value="La atención selectiva se produce de forma inconsciente, mientras que la atención dividida es un acto totalmente consciente y voluntario."> La atención selectiva se produce de forma inconsciente y automática, mientras que la atención dividida es un acto totalmente consciente y voluntario del individuo.</label>
+                        <label><input type="radio" name="q28" value="La atención selectiva filtra y se concentra en un único estímulo, mientras que la dividida distribuye el foco atencional entre varios estímulos o tareas simultáneas."> La atención selectiva filtra y se concentra en un único estímulo, mientras que la dividida distribuye el foco atencional entre varios estímulos o tareas simultáneas.</label>
+                        <label><input type="radio" name="q28" value="Generalmente, la atención dividida es mucho más fácil de ejecutar y mantener que la atención selectiva debido a su naturaleza pasiva."> Generalmente, la atención dividida es mucho más fácil de ejecutar y mantener que la atención selectiva, dada su naturaleza más pasiva y menos exigente.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: La atención selectiva filtra y se concentra en un único estímulo, mientras que la dividida distribuye el foco atencional entre varios estímulos o tareas simultáneas.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q28-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 8: Funciones Ejecutivas como proceso psicológico superior -->
+            <div class="question-section">
+                <h2>8. Funciones Ejecutivas como proceso psicológico superior</h2>
+                <div class="question-item" id="q29-item" data-correct-answer="Son procesos cognitivos de alto nivel que controlan y regulan el pensamiento y la conducta, funcionando como una 'sala de control' cerebral.">
+                    <p>29. ¿Qué son las funciones ejecutivas?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q29" value="Se refieren principalmente a las habilidades motoras básicas y a los reflejos involuntarios del cuerpo humano, sin implicar cognición."> Se refieren principalmente a las habilidades motoras básicas y a los reflejos involuntarios del cuerpo humano, sin implicar ninguna función cognitiva superior o compleja.</label>
+                        <label><input type="radio" name="q29" value="Son procesos cognitivos que ocurren de manera automática y sin necesidad de intervención consciente o esfuerzo mental."> Son procesos cognitivos que ocurren de manera automática y sin necesidad de intervención consciente o esfuerzo mental por parte del individuo.</label>
+                        <label><input type="radio" name="q29" value="Son procesos cognitivos de alto nivel que controlan y regulan el pensamiento y la conducta, funcionando como una 'sala de control' cerebral."> Son procesos cognitivos de alto nivel que controlan y regulan el pensamiento y la conducta, funcionando como una 'sala de control' cerebral.</label>
+                        <label><input type="radio" name="q29" value="Su función se limita exclusivamente a la retención de información en la memoria a corto plazo, sin ninguna otra aplicación práctica."> Su función se limita exclusivamente a la retención de información en la memoria a corto plazo, sin ninguna otra aplicación práctica o influencia en otros procesos mentales.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Son procesos cognitivos de alto nivel que controlan y regulan el pensamiento y la conducta, funcionando como una 'sala de control' cerebral.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q29-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q30-item" data-correct-answer="Componentes clave son la memoria de trabajo, flexibilidad cognitiva, inhibición de respuesta (autocontrol), planificación, toma de decisiones, organización, fluidez verbal y monitoreo.">
+                    <p>30. Componentes clave de las funciones ejecutivas:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q30" value="Se limitan a la percepción visual y la sensación táctil como únicos componentes, excluyendo otros aspectos cognitivos."> Se limitan a la percepción visual y la sensación táctil como únicos componentes, dejando de lado cualquier otro aspecto cognitivo o mental más complejo.</label>
+                        <label><input type="radio" name="q30" value="Consisten en los movimientos reflejos automáticos y la regulación de la respiración pulmonar, sin control consciente."> Consisten en los movimientos reflejos automáticos y la regulación de la respiración pulmonar, los cuales son procesos fisiológicos básicos que ocurren sin control consciente.</label>
+                        <label><input type="radio" name="q30" value="Componentes clave son la memoria de trabajo, flexibilidad cognitiva, inhibición de respuesta (autocontrol), planificación, toma de decisiones, organización, fluidez verbal y monitoreo."> Componentes clave son la memoria de trabajo, flexibilidad cognitiva, inhibición de respuesta (autocontrol), planificación, toma de decisiones, organización, fluidez verbal y monitoreo.</label>
+                        <label><input type="radio" name="q30" value="Incluyen únicamente la capacidad visual y la habilidad auditiva como factores principales, sin considerar otros sentidos."> Incluyen únicamente la capacidad visual y la habilidad auditiva como factores principales, ignorando cualquier otro sentido o forma de procesamiento de información.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Componentes clave son la memoria de trabajo, flexibilidad cognitiva, inhibición de respuesta (autocontrol), planificación, toma de decisiones, organización, fluidez verbal y monitoreo.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q30-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q31-item" data-correct-answer="Ejemplos son planificar un viaje complejo, cambiar una ruta debido al tráfico, evitar decir algo impulsivo, organizar eficientemente el escritorio o seguir instrucciones detalladas.">
+                    <p>31. Ejemplo de uso de funciones ejecutivas:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q31" value="Acciones reflejas e involuntarias como el estornudo o la tos sin control, que no requieren de una decisión consciente."> Acciones reflejas e involuntarias como el estornudo o la tos sin control, las cuales no requieren de una decisión consciente o un procesamiento cognitivo complejo.</label>
+                        <label><input type="radio" name="q31" value="Estar en un estado de sueño profundo sin ningún tipo de actividad mental consciente, experimentando solo descanso."> Estar en un estado de sueño profundo sin ningún tipo de actividad mental consciente, lo que implica que el cerebro se encuentra en un estado de completo descanso.</label>
+                        <label><input type="radio" name="q31" value="Ejemplos son planificar un viaje complejo, cambiar una ruta debido al tráfico, evitar decir algo impulsivo, organizar eficientemente el escritorio o seguir instrucciones detalladas."> Ejemplos son planificar un viaje complejo, cambiar una ruta debido al tráfico, evitar decir algo impulsivo, organizar eficientemente el escritorio o seguir instrucciones detalladas.</label>
+                        <label><input type="radio" name="q31" value="Experimentar sensaciones fisiológicas básicas como el hambre o la sed, que son necesidades biológicas primarias."> Experimentar sensaciones fisiológicas básicas como el hambre o la sed, las cuales son necesidades biológicas primarias que no involucran un pensamiento superior.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos son planificar un viaje complejo, cambiar una ruta debido al tráfico, evitar decir algo impulsivo, organizar eficientemente el escritorio o seguir instrucciones detalladas.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q31-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q32-item" data-correct-answer="Son cruciales para adaptarse a nuevas situaciones, resolver problemas, tomar decisiones informadas y controlar los impulsos de manera efectiva.">
+                    <p>32. ¿Qué importancia tienen las funciones ejecutivas en la vida diaria?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q32" value="Su relevancia se limita estrictamente al ámbito académico y al rendimiento escolar, sin impacto en otras áreas de la vida."> Su relevancia se limita estrictamente al ámbito académico y al rendimiento escolar, sin tener un impacto significativo en otras áreas de la vida cotidiana.</label>
+                        <label><input type="radio" name="q32" value="No poseen ninguna importancia práctica o relevancia significativa en la vida cotidiana de una persona, siendo poco relevantes."> No poseen ninguna importancia práctica o relevancia significativa en la vida cotidiana de una persona, considerándose procesos poco relevantes.</label>
+                        <label><input type="radio" name="q32" value="Son cruciales para adaptarse a nuevas situaciones, resolver problemas, tomar decisiones informadas y controlar los impulsos de manera efectiva."> Son cruciales para adaptarse a nuevas situaciones, resolver problemas, tomar decisiones informadas y controlar los impulsos de manera efectiva.</label>
+                        <label><input type="radio" name="q32" value="Solo impactan y afectan la capacidad de recordar información y eventos pasados, sin influir en otras habilidades cognitivas."> Solo impactan y afectan la capacidad de recordar información y eventos pasados, sin influir en otras habilidades cognitivas más complejas.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Son cruciales para adaptarse a nuevas situaciones, resolver problemas, tomar decisiones informadas y controlar los impulsos de manera efectiva.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q32-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q33-item" data-correct-answer="Se asocian a trastornos como el TDAH, autismo, demencias (Alzheimer), lesiones cerebrales, esquizofrenia y trastorno bipolar.">
+                    <p>33. ¿Qué trastornos se asocian a disfunciones ejecutivas?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q33" value="Únicamente se asocian con trastornos relacionados con la capacidad visual, como la miopía o el astigmatismo."> Únicamente se asocian con trastornos relacionados con la capacidad visual, como la miopía o el astigmatismo, sin afectar otras funciones.</label>
+                        <label><input type="radio" name="q33" value="Están vinculados exclusivamente a problemas relacionados con el ciclo del sueño, como el insomnio crónico o la narcolepsia."> Están vinculados exclusivamente a problemas relacionados con el ciclo del sueño, como el insomnio crónico o la narcolepsia, sin otros impactos.</label>
+                        <label><input type="radio" name="q33" value="Se asocian a trastornos como el TDAH, autismo, demencias (Alzheimer), lesiones cerebrales, esquizofrenia y trastorno bipolar."> Se asocian a trastornos como el TDAH, autismo, demencias (Alzheimer), lesiones cerebrales, esquizofrenia y trastorno bipolar.</label>
+                        <label><input type="radio" name="q33" value="No se han encontrado asociaciones con ningún tipo de trastorno mental conocido o diagnosticado."> No se han encontrado asociaciones con ningún tipo de trastorno mental conocido o diagnosticado, lo que sugiere que son independientes.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Se asocian a trastornos como el TDAH, autismo, demencias (Alzheimer), lesiones cerebrales, esquizofrenia y trastorno bipolar.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q33-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 9: Inteligencia como proceso psicológico superior -->
+            <div class="question-section">
+                <h2>9. Inteligencia como proceso psicológico superior</h2>
+                <div class="question-item" id="q34-item" data-correct-answer="Se define como la capacidad general de adaptarse a nuevas situaciones, aprender de la experiencia, comprender conceptos y resolver problemas de forma flexible.">
+                    <p>34. ¿Cómo se define la inteligencia en psicología?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q34" value="Se define únicamente como la habilidad para memorizar una gran cantidad de información rápidamente, sin implicar análisis."> Se define únicamente como la habilidad para memorizar una gran cantidad de información rápidamente y con precisión, sin implicar ningún tipo de análisis o procesamiento.</label>
+                        <label><input type="radio" name="q34" value="Se define como la capacidad general de adaptarse a nuevas situaciones, aprender de la experiencia, comprender conceptos y resolver problemas de forma flexible."> Se define como la capacidad general de adaptarse a nuevas situaciones, aprender de la experiencia, comprender conceptos y resolver problemas de forma flexible.</label>
+                        <label><input type="radio" name="q34" value="Su significado se reduce solo a la habilidad para sobresalir en el campo de las matemáticas, excluyendo otras áreas del conocimiento."> Su significado se reduce solo a la habilidad para sobresalir en el campo de las matemáticas, ignorando por completo otras áreas del conocimiento o habilidades cognitivas.</label>
+                        <label><input type="radio" name="q34" value="Consiste exclusivamente en la velocidad con la que una persona puede procesar la información, sin importar la calidad o profundidad del análisis."> Consiste exclusivamente en la velocidad con la que una persona puede procesar la información, sin que la calidad o profundidad del análisis sean factores relevantes.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Se define como la capacidad general de adaptarse a nuevas situaciones, aprender de la experiencia, comprender conceptos y resolver problemas de forma flexible.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q34-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q35-item" data-correct-answer="Porque integra y coordina eficazmente múltiples procesos básicos, tales como la atención, percepción, memoria, lenguaje y pensamiento, para funcionar de forma superior.">
+                    <p>35. ¿Por qué la inteligencia es un proceso superior?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q35" value="Es considerada superior porque es una habilidad innata que no puede ser desarrollada ni mejorada con el tiempo o el aprendizaje."> Es considerada superior porque es una habilidad innata que no puede ser desarrollada ni mejorada con el tiempo o el aprendizaje, siendo estática.</label>
+                        <label><input type="radio" name="q35" value="No requiere de la intervención o el apoyo de otros procesos cognitivos para su manifestación, operando de forma independiente."> No requiere de la intervención o el apoyo de otros procesos cognitivos para su manifestación, lo que implica que opera de forma completamente independiente.</label>
+                        <label><input type="radio" name="q35" value="Porque integra y coordina eficazmente múltiples procesos básicos, tales como la atención, percepción, memoria, lenguaje y pensamiento, para funcionar de forma superior."> Porque integra y coordina eficazmente múltiples procesos básicos, tales como la atención, percepción, memoria, lenguaje y pensamiento, para funcionar de forma superior.</label>
+                        <label><input type="radio" name="q35" value="Es un proceso que se limita a ser meramente emocional, sin componentes racionales o lógicos que lo fundamenten."> Es un proceso que se limita a ser meramente emocional, careciendo de componentes racionales o lógicos que lo fundamenten en la toma de decisiones.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Porque integra y coordina eficazmente múltiples procesos básicos, tales como la atención, percepción, memoria, lenguaje y pensamiento, para funcionar de forma superior.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q35-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q36-item" data-correct-answer="Sus características incluyen abstracción y simbolización, flexibilidad y adaptabilidad, aprendizaje y experiencia, autorregulación y metacognición, y una fuerte influencia cultural.">
+                    <p>36. Características de la inteligencia superior:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q36" value="Es una habilidad rígida e inmutable que no experimenta cambios a lo largo del tiempo, permaneciendo constante desde el nacimiento."> Es una habilidad rígida e inmutable que no experimenta cambios a lo largo del tiempo, permaneciendo constante desde el nacimiento hasta la adultez.</label>
+                        <label><input type="radio" name="q36" value="Su desarrollo se fundamenta únicamente en la cantidad de conocimiento que se logra memorizar, sin implicar un procesamiento profundo."> Su desarrollo se fundamenta únicamente en la cantidad de conocimiento que se logra memorizar, sin que exista un procesamiento profundo o una comprensión real.</label>
+                        <label><input type="radio" name="q36" value="Sus características incluyen abstracción y simbolización, flexibilidad y adaptabilidad, aprendizaje y experiencia, autorregulación y metacognición, y una fuerte influencia cultural."> Sus características incluyen abstracción y simbolización, flexibilidad y adaptabilidad, aprendizaje y experiencia, autorregulación y metacognición, y una fuerte influencia cultural.</label>
+                        <label><input type="radio" name="q36" value="No se ve afectada de ninguna manera por el entorno cultural en el que se desenvuelve el individuo, siendo universal."> No se ve afectada de ninguna manera por el entorno cultural en el que se desenvuelve el individuo, lo que la convierte en una capacidad universal.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Sus características incluyen abstracción y simbolización, flexibilidad y adaptabilidad, aprendizaje y experiencia, autorregulación y metacognición, y una fuerte influencia cultural.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q36-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q37-item" data-correct-answer="Ejemplos de inteligencia en acción son resolver problemas complejos, adaptarse a nuevas culturas, innovar, tomar decisiones éticas, crear arte o formular teorías científicas.">
+                    <p>37. Ejemplos de inteligencia en acción:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q37" value="Acciones motoras básicas como caminar erguido o la capacidad de correr a gran velocidad, que son reflejos simples."> Acciones motoras básicas como caminar erguido o la capacidad de correr a gran velocidad, las cuales son consideradas reflejos simples y automáticos.</label>
+                        <label><input type="radio" name="q37" value="Funciones biológicas esenciales como dormir plácidamente o el acto de alimentarse, fundamentales para la supervivencia del organismo."> Funciones biológicas esenciales como dormir plácidamente o el acto de alimentarse, ambas fundamentales para la supervivencia del organismo y el mantenimiento de la vida.</label>
+                        <label><input type="radio" name="q37" value="Ejemplos de inteligencia en acción son resolver problemas complejos, adaptarse a nuevas culturas, innovar, tomar decisiones éticas, crear arte o formular teorías científicas."> Ejemplos de inteligencia en acción son resolver problemas complejos, adaptarse a nuevas culturas, innovar, tomar decisiones éticas, crear arte o formular teorías científicas.</label>
+                        <label><input type="radio" name="q37" value="Un reflejo simple e involuntario como el parpadeo de los ojos, que ocurre sin ningún tipo de control consciente."> Un reflejo simple e involuntario como el parpadeo de los ojos, que ocurre sin ningún tipo de control consciente ni procesamiento cognitivo complejo.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos de inteligencia en acción son resolver problemas complejos, adaptarse a nuevas culturas, innovar, tomar decisiones éticas, crear arte o formular teorías científicas.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q37-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 10: Teoría de las Inteligencias Múltiples (Howard Gardner) -->
+            <div class="question-section">
+                <h2>10. Teoría de las Inteligencias Múltiples (Howard Gardner)</h2>
+                <div class="question-item" id="q38-item" data-correct-answer="Fue propuesta por Howard Earl Gardner, un renombrado psicólogo estadounidense, quien revolucionó la comprensión de la inteligencia.">
+                    <p>38. ¿Quién propuso la teoría de las inteligencias múltiples?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q38" value="Sigmund Freud, el influyente padre del psicoanálisis, conocido por sus teorías sobre el inconsciente y los mecanismos de defensa."> Sigmund Freud, el influyente padre del psicoanálisis, conocido por sus teorías sobre el inconsciente, la sexualidad y los mecanismos de defensa psicológicos.</label>
+                        <label><input type="radio" name="q38" value="B.F. Skinner, un destacado psicólogo conductista que investigó el condicionamiento operante y el aprendizaje por refuerzo."> B.F. Skinner, un destacado psicólogo conductista que investigó el condicionamiento operante y el aprendizaje por refuerzo, enfocándose en la conducta observable.</label>
+                        <label><input type="radio" name="q38" value="Fue propuesta por Howard Earl Gardner, un renombrado psicólogo estadounidense, quien revolucionó la comprensión de la inteligencia."> Fue propuesta por Howard Earl Gardner, un renombrado psicólogo estadounidense, quien revolucionó la comprensión de la inteligencia.</label>
+                        <label><input type="radio" name="q38" value="Jean Piaget, un eminente psicólogo suizo, famoso por sus estudios sobre el desarrollo cognitivo infantil y las etapas del pensamiento."> Jean Piaget, un eminente psicólogo suizo, famoso por sus estudios sobre el desarrollo cognitivo infantil y las etapas de cómo los niños construyen su conocimiento del mundo.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Fue propuesta por Howard Earl Gardner, un renombrado psicólogo estadounidense, quien revolucionó la comprensión de la inteligencia.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q38-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q39-item" data-correct-answer="Plantea que la inteligencia no es una entidad única, sino un conjunto diverso de habilidades relativamente independientes que cada persona desarrolla en diferente grado.">
+                    <p>39. ¿Qué plantea la teoría de las inteligencias múltiples?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q39" value="Sugiere que solo existe una única forma predominante de inteligencia en todos los individuos, medida por el coeficiente intelectual (CI)."> Sugiere que solo existe una única forma predominante de inteligencia en todos los individuos, la cual puede ser medida de manera fiable y precisa a través del coeficiente intelectual (CI).</label>
+                        <label><input type="radio" name="q39" value="Propone que la inteligencia es una habilidad innata y fija que se establece desde el momento del nacimiento, sin posibilidad de cambio posterior."> Propone que la inteligencia es una habilidad innata y fija que se establece desde el momento del nacimiento, lo que significa que no hay posibilidad de desarrollo o cambio posterior.</label>
+                        <label><input type="radio" name="q39" value="Plantea que la inteligencia no es una entidad única, sino un conjunto diverso de habilidades relativamente independientes que cada persona desarrolla en diferente grado."> Plantea que la inteligencia no es una entidad única, sino un conjunto diverso de habilidades relativamente independientes que cada persona desarrolla en diferente grado.</label>
+                        <label><input type="radio" name="q39" value="Afirma que la inteligencia únicamente puede ser evaluada y medida a través del coeficiente intelectual (CI) estandarizado."> Afirma que la inteligencia únicamente puede ser evaluada y medida a través del coeficiente intelectual (CI) estandarizado, sin considerar otras formas de evaluación.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Plantea que la inteligencia no es una entidad única, sino un conjunto diverso de habilidades relativamente independientes que cada persona desarrolla en diferente grado.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q39-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q40-item" data-correct-answer="Las inteligencias propuestas por Gardner incluyen Lingüística-verbal, Lógico-matemática, Espacial-visual, Musical-auditiva, Corporal-kinestésica, Intrapersonal, Interpersonal y Naturalista (a veces Emocional).">
+                    <p>40. ¿Cuáles son las inteligencias propuestas por Gardner?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q40" value="Según Gardner, las únicas inteligencias que existen son la intelectual y la emocional, sin considerar otras facetas humanas."> Según Gardner, las únicas inteligencias que existen son la intelectual y la emocional, excluyendo por completo otras facetas importantes de la capacidad humana.</label>
+                        <label><input type="radio" name="q40" value="Las únicas inteligencias que propuso son la lógica y la espacial, sin incluir otras categorías más complejas."> Las únicas inteligencias que propuso son la lógica y la espacial, sin incluir otras categorías más complejas o diversificadas de la inteligencia.</label>
+                        <label><input type="radio" name="q40" value="Las inteligencias propuestas por Gardner incluyen Lingüística-verbal, Lógico-matemática, Espacial-visual, Musical-auditiva, Corporal-kinestésica, Intrapersonal, Interpersonal y Naturalista (a veces Emocional)."> Las inteligencias propuestas por Gardner incluyen Lingüística-verbal, Lógico-matemática, Espacial-visual, Musical-auditiva, Corporal-kinestésica, Intrapersonal, Interpersonal y Naturalista (a veces Emocional).</label>
+                        <label><input type="radio" name="q40" value="Sus categorías de inteligencia se limitan a la memoria y la atención, como procesos básicos y fundamentales del ser humano."> Sus categorías de inteligencia se limitan a la memoria y la atención, considerándolas los únicos procesos básicos y fundamentales que conforman la inteligencia.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Las inteligencias propuestas por Gardner incluyen Lingüística-verbal, Lógico-matemática, Espacial-visual, Musical-auditiva, Corporal-kinestésica, Intrapersonal, Interpersonal y Naturalista (a veces Emocional).</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q40-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q41-item" data-correct-answer="Un ejemplo de inteligencia lingüística-verbal es la facilidad notable para hablar, escribir, debatir, leer o aprender nuevos idiomas con fluidez.">
+                    <p>41. Ejemplo de inteligencia lingüística-verbal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q41" value="Se refiere a la habilidad para resolver problemas matemáticos de alta complejidad, utilizando el razonamiento abstracto."> Se refiere a la habilidad para resolver problemas matemáticos de alta complejidad, lo que implica el uso extensivo del razonamiento abstracto y lógico.</label>
+                        <label><input type="radio" name="q41" value="Implica la capacidad para dibujar mapas detallados y comprender la orientación espacial, demostrando una fuerte visualización."> Implica la capacidad para dibujar mapas detallados y comprender la orientación espacial, lo cual demuestra una fuerte habilidad de visualización mental.</label>
+                        <label><input type="radio" name="q41" value="Un ejemplo de inteligencia lingüística-verbal es la facilidad notable para hablar, escribir, debatir, leer o aprender nuevos idiomas con fluidez."> Un ejemplo de inteligencia lingüística-verbal es la facilidad notable para hablar, escribir, debatir, leer o aprender nuevos idiomas con fluidez.</label>
+                        <label><input type="radio" name="q41" value="Consiste en la destreza para tocar un instrumento musical y componer melodías originales, con sentido del ritmo y armonía."> Consiste en la destreza para tocar un instrumento musical y componer melodías originales, demostrando un profundo sentido del ritmo y la armonía musical.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Un ejemplo de inteligencia lingüística-verbal es la facilidad notable para hablar, escribir, debatir, leer o aprender nuevos idiomas con fluidez.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q41-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q42-item" data-correct-answer="Ejemplos de inteligencia lógico-matemática incluyen resolver problemas matemáticos, aplicar el razonamiento lógico o dedicarse a la programación informática.">
+                    <p>42. Ejemplo de inteligencia lógico-matemática:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q42" value="La habilidad de componer y escribir poesía con gran sensibilidad y creatividad, expresando emociones y pensamientos profundos."> La habilidad de componer y escribir poesía con gran sensibilidad y creatividad, lo cual permite expresar emociones y pensamientos profundos de forma artística.</label>
+                        <label><input type="radio" name="q42" value="La destreza y coordinación necesarias para bailar diversos estilos de danza con ritmo y expresión corporal."> La destreza y coordinación necesarias para bailar diversos estilos de danza con ritmo y expresión corporal, utilizando el cuerpo como principal herramienta.</label>
+                        <label><input type="radio" name="q42" value="Ejemplos de inteligencia lógico-matemática incluyen resolver problemas matemáticos, aplicar el razonamiento lógico o dedicarse a la programación informática."> Ejemplos de inteligencia lógico-matemática incluyen resolver problemas matemáticos, aplicar el razonamiento lógico o dedicarse a la programación informática.</label>
+                        <label><input type="radio" name="q42" value="Capacidad para observar el entorno natural e identificar diferentes especies de plantas, así como clasificarlas científicamente."> Capacidad para observar el entorno natural e identificar diferentes especies de plantas, así como clasificarlas científicamente según sus características botánicas.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos de inteligencia lógico-matemática incluyen resolver problemas matemáticos, aplicar el razonamiento lógico o dedicarse a la programación informática.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q42-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q43-item" data-correct-answer="Un ejemplo de inteligencia espacial-visual es la habilidad para dibujar, diseñar, comprender mapas y planos, o construir maquetas detalladas.">
+                    <p>43. Ejemplo de inteligencia espacial-visual:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q43" value="La capacidad de crear y componer una melodía musical original con armonía y ritmo, utilizando diversos instrumentos."> La capacidad de crear y componer una melodía musical original con armonía y ritmo, utilizando diversos instrumentos musicales para su interpretación.</label>
+                        <label><input type="radio" name="q43" value="Participar activamente en un debate público y convencer a la audiencia con argumentos sólidos y persuasivos."> Participar activamente en un debate público y convencer a la audiencia con argumentos sólidos y persuasivos, demostrando habilidades retóricas.</label>
+                        <label><input type="radio" name="q43" value="Un ejemplo de inteligencia espacial-visual es la habilidad para dibujar, diseñar, comprender mapas y planos, o construir maquetas detalladas."> Un ejemplo de inteligencia espacial-visual es la habilidad para dibujar, diseñar, comprender mapas y planos, o construir maquetas detalladas.</label>
+                        <label><input type="radio" name="q43" value="La capacidad de una persona para entender y gestionar sus propias emociones internas, así como sus motivaciones y deseos."> La capacidad de una persona para entender y gestionar sus propias emociones internas, así como sus motivaciones y deseos personales de forma consciente.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Un ejemplo de inteligencia espacial-visual es la habilidad para dibujar, diseñar, comprender mapas y planos, o construir maquetas detalladas.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q43-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q44-item" data-correct-answer="Un ejemplo de inteligencia musical-auditiva es la habilidad para tocar un instrumento, identificar ritmos y melodías, o componer música.">
+                    <p>44. Ejemplo de inteligencia musical-auditiva:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q44" value="La destreza estratégica necesaria para jugar al ajedrez a un nivel avanzado, anticipando movimientos y desarrollando tácticas complejas."> La destreza estratégica necesaria para jugar al ajedrez a un nivel avanzado, anticipando movimientos y desarrollando tácticas complejas para la victoria.</label>
+                        <label><input type="radio" name="q44" value="La habilidad técnica y creativa para diseñar y construir grandes edificios o estructuras arquitectónicas innovadoras."> La habilidad técnica y creativa para diseñar y construir grandes edificios o estructuras arquitectónicas innovadoras, combinando funcionalidad y estética.</label>
+                        <label><input type="radio" name="q44" value="Un ejemplo de inteligencia musical-auditiva es la habilidad para tocar un instrumento, identificar ritmos y melodías, o componer música."> Un ejemplo de inteligencia musical-auditiva es la habilidad para tocar un instrumento, identificar ritmos y melodías, o componer música.</label>
+                        <label><input type="radio" name="q44" value="La capacidad para liderar y gestionar eficazmente un equipo de trabajo en un proyecto, motivando y coordinando a los miembros."> La capacidad para liderar y gestionar eficazmente un equipo de trabajo en un proyecto, motivando y coordinando a los miembros para lograr objetivos comunes.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Un ejemplo de inteligencia musical-auditiva es la habilidad para tocar un instrumento, identificar ritmos y melodías, o componer música.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q44-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q45-item" data-correct-answer="Ejemplos de inteligencia corporal-kinestésica son la destreza física, la práctica de deportes, el baile o la realización de manualidades.">
+                    <p>45. Ejemplo de inteligencia corporal-kinestésica:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q45" value="La capacidad de redactar un ensayo argumentativo o un texto literario complejo, demostrando habilidad con las palabras."> La capacidad de redactar un ensayo argumentativo o un texto literario complejo, demostrando una gran habilidad con las palabras y la expresión escrita.</label>
+                        <label><input type="radio" name="q45" value="La habilidad de resolver problemas lógicos muy complejos o acertijos intrincados, aplicando el razonamiento deductivo."> La habilidad de resolver problemas lógicos muy complejos o acertijos intrincados, utilizando el razonamiento deductivo y el pensamiento crítico.</label>
+                        <label><input type="radio" name="q45" value="Ejemplos de inteligencia corporal-kinestésica son la destreza física, la práctica de deportes, el baile o la realización de manualidades."> Ejemplos de inteligencia corporal-kinestésica son la destreza física, la práctica de deportes, el baile o la realización de manualidades.</label>
+                        <label><input type="radio" name="q45" value="La capacidad de memorizar una extensa lista de fechas históricas y eventos relevantes de forma cronológica y detallada."> La capacidad de memorizar una extensa lista de fechas históricas y eventos relevantes, organizándolos de forma cronológica y detallada en la memoria.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos de inteligencia corporal-kinestésica son la destreza física, la práctica de deportes, el baile o la realización de manualidades.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q45-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q46-item" data-correct-answer="Ejemplos de inteligencia intrapersonal son el autoconocimiento profundo, la capacidad de reconocer las propias emociones o la reflexión sobre metas personales.">
+                    <p>46. Ejemplo de inteligencia intrapersonal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q46" value="La habilidad de persuadir y convencer a otras personas en un debate o discusión, utilizando argumentos lógicos y emocionales."> La habilidad de persuadir y convencer a otras personas en un debate o discusión, utilizando tanto argumentos lógicos como emocionales para influir.</label>
+                        <label><input type="radio" name="q46" value="Ejemplos de inteligencia intrapersonal son el autoconocimiento profundo, la capacidad de reconocer las propias emociones o la reflexión sobre metas personales."> Ejemplos de inteligencia intrapersonal son el autoconocimiento profundo, la capacidad de reconocer las propias emociones o la reflexión sobre metas personales.</label>
+                        <label><input type="radio" name="q46" value="La destreza para impartir conocimientos y enseñar a un grupo de estudiantes, facilitando su aprendizaje y comprensión."> La destreza para impartir conocimientos y enseñar a un grupo de estudiantes, utilizando diversas metodologías para facilitar su aprendizaje y comprensión.</label>
+                        <label><input type="radio" name="q46" value="Capacidad para identificar y clasificar diferentes tipos de rocas geológicas, basándose en sus características físicas y composición."> Capacidad para identificar y clasificar diferentes tipos de rocas geológicas, basándose en sus características físicas y composición química específica.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos de inteligencia intrapersonal son el autoconocimiento profundo, la capacidad de reconocer las propias emociones o la reflexión sobre metas personales.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q46-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q47-item" data-correct-answer="Ejemplos de inteligencia interpersonal son la empatía hacia otros, la comunicación efectiva, el liderazgo de grupos o el trabajo colaborativo en equipo.">
+                    <p>47. Ejemplo de inteligencia interpersonal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q47" value="La habilidad para desarrollar y crear un programa de computadora o una aplicación digital, utilizando lenguajes de programación."> La habilidad para desarrollar y crear un programa de computadora o una aplicación digital, aplicando conocimientos avanzados de lenguajes de programación.</label>
+                        <label><input type="radio" name="q47" value="Capacidad de interpretar y comprender correctamente un mapa topográfico, identificando elevaciones y rutas."> Capacidad de interpretar y comprender correctamente un mapa topográfico, identificando elevaciones, curvas de nivel y posibles rutas.</label>
+                        <label><input type="radio" name="q47" value="Ejemplos de inteligencia interpersonal son la empatía hacia otros, la comunicación efectiva, el liderazgo de grupos o el trabajo colaborativo en equipo."> Ejemplos de inteligencia interpersonal son la empatía hacia otros, la comunicación efectiva, el liderazgo de grupos o el trabajo colaborativo en equipo.</label>
+                        <label><input type="radio" name="q47" value="La destreza para diseñar la estructura y apariencia de un edificio arquitectónico, combinando funcionalidad y estética."> La destreza para diseñar la estructura y apariencia de un edificio arquitectónico, logrando combinar la funcionalidad con la estética visual de forma armoniosa.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos de inteligencia interpersonal son la empatía hacia otros, la comunicación efectiva, el liderazgo de grupos o el trabajo colaborativo en equipo.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q47-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q48-item" data-correct-answer="Ejemplos de inteligencia naturalista son observar la naturaleza, clasificar plantas y animales, practicar la jardinería o identificar patrones en el entorno natural.">
+                    <p>48. Ejemplo de inteligencia naturalista:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q48" value="La habilidad para interpretar y tocar un instrumento musical como el piano, mostrando sensibilidad artística y técnica."> La habilidad para interpretar y tocar un instrumento musical como el piano, demostrando sensibilidad artística y dominio técnico.</label>
+                        <label><input type="radio" name="q48" value="La destreza para escribir un poema con un estilo literario elaborado, utilizando metáforas y figuras retóricas."> La destreza para escribir un poema con un estilo literario elaborado, empleando metáforas y figuras retóricas para enriquecer el texto.</label>
+                        <label><input type="radio" name="q48" value="Ejemplos de inteligencia naturalista son observar la naturaleza, clasificar plantas y animales, practicar la jardinería o identificar patrones en el entorno natural."> Ejemplos de inteligencia naturalista son observar la naturaleza, clasificar plantas y animales, practicar la jardinería o identificar patrones en el entorno natural.</label>
+                        <label><input type="radio" name="q48" value="La capacidad de diseñar una estrategia de negocios exitosa y rentable, analizando el mercado y la competencia."> La capacidad de diseñar una estrategia de negocios exitosa y rentable, analizando cuidadosamente el mercado y la competencia existente.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejemplos de inteligencia naturalista son observar la naturaleza, clasificar plantas y animales, practicar la jardinería o identificar patrones en el entorno natural.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q48-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 11: Plasticidad cerebral y desarrollo de la inteligencia -->
+            <div class="question-section">
+                <h2>11. Plasticidad cerebral y desarrollo de la inteligencia</h2>
+                <div class="question-item" id="q49-item" data-correct-answer="Es la capacidad del cerebro para cambiar y formar nuevas conexiones neuronales a lo largo de toda la vida, adaptándose a nuevas experiencias y aprendizajes.">
+                    <p>49. ¿Qué es la plasticidad cerebral?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q49" value="Se refiere a la rigidez inherente del cerebro que impide la formación de nuevos aprendizajes y la adaptación a cambios ambientales."> Se refiere a la rigidez inherente del cerebro que impide la formación de nuevos aprendizajes y la adaptación a los cambios en el entorno ambiental.</label>
+                        <label><input type="radio" name="q49" value="Describe el crecimiento físico del tamaño del cerebro en la etapa adulta de la vida, aumentando su volumen de manera significativa."> Describe el crecimiento físico del tamaño del cerebro en la etapa adulta de la vida, lo que resulta en un aumento significativo de su volumen total.</label>
+                        <label><input type="radio" name="q49" value="Es la capacidad del cerebro para cambiar y formar nuevas conexiones neuronales a lo largo de toda la vida, adaptándose a nuevas experiencias y aprendizajes."> Es la capacidad del cerebro para cambiar y formar nuevas conexiones neuronales a lo largo de toda la vida, adaptándose a nuevas experiencias y aprendizajes.</label>
+                        <label><input type="radio" name="q49" value="Hace alusión a la capacidad de los músculos para estirarse y contraerse, no a una función cerebral, sino a una cualidad física."> Hace alusión a la capacidad de los músculos para estirarse y contraerse, lo que es una cualidad física del cuerpo, no una función cerebral o cognitiva.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es la capacidad del cerebro para cambiar y formar nuevas conexiones neuronales a lo largo de toda la vida, adaptándose a nuevas experiencias y aprendizajes.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q49-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q50-item" data-correct-answer="Es fundamental porque permite desarrollar y mejorar diferentes tipos de inteligencia a través de la práctica constante y la estimulación adecuada.">
+                    <p>50. ¿Por qué es importante la plasticidad cerebral?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q50" value="Su importancia se limita exclusivamente al desarrollo físico y al crecimiento del cuerpo, sin afectar la mente."> Su importancia se limita exclusivamente al desarrollo físico y al crecimiento del cuerpo, sin tener ningún tipo de impacto o relevancia en el desarrollo de la mente.</label>
+                        <label><input type="radio" name="q50" value="No posee ningún tipo de impacto o influencia en el desarrollo de la inteligencia humana, siendo procesos independientes."> No posee ningún tipo de impacto o influencia en el desarrollo de la inteligencia humana, lo que implica que son procesos completamente independientes.</label>
+                        <label><input type="radio" name="q50" value="Es fundamental porque permite desarrollar y mejorar diferentes tipos de inteligencia a través de la práctica constante y la estimulación adecuada."> Es fundamental porque permite desarrollar y mejorar diferentes tipos de inteligencia a través de la práctica constante y la estimulación adecuada.</label>
+                        <label><input type="radio" name="q50" value="Su relevancia solo es significativa durante las primeras etapas de la infancia, perdiendo importancia en la adultez."> Su relevancia solo es significativa durante las primeras etapas de la infancia, y su impacto disminuye considerablemente en la etapa adulta.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Es fundamental porque permite desarrollar y mejorar diferentes tipos de inteligencia a través de la práctica constante y la estimulación adecuada.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q50-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q51-item" data-correct-answer="Ejercicios generales para estimular la inteligencia incluyen aprender algo nuevo, leer y escribir, resolver acertijos, jugar ajedrez o cambiar rutinas diarias.">
+                    <p>51. Menciona un ejercicio general para estimular la inteligencia:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q51" value="Ver programas de televisión de forma continua sin pausas ni interrupciones, fomentando el ocio pasivo."> Ver programas de televisión de forma continua sin pausas ni interrupciones, lo cual fomenta un estado de ocio pasivo y poca actividad mental.</label>
+                        <label><input type="radio" name="q51" value="Dormir una gran cantidad de horas sin realizar ninguna actividad mental activa, priorizando el descanso total."> Dormir una gran cantidad de horas sin realizar ninguna actividad mental activa, priorizando un estado de descanso total para el cerebro y el cuerpo.</label>
+                        <label><input type="radio" name="q51" value="Ejercicios generales para estimular la inteligencia incluyen aprender algo nuevo, leer y escribir, resolver acertijos, jugar ajedrez o cambiar rutinas diarias."> Ejercicios generales para estimular la inteligencia incluyen aprender algo nuevo, leer y escribir, resolver acertijos, jugar ajedrez o cambiar rutinas diarias.</label>
+                        <label><input type="radio" name="q51" value="Realizar siempre las mismas tareas rutinarias sin introducir ninguna variación, manteniendo un patrón de actividad constante."> Realizar siempre las mismas tareas rutinarias sin introducir ninguna variación, lo cual contribuye a mantener un patrón de actividad constante.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Ejercicios generales para estimular la inteligencia incluyen aprender algo nuevo, leer y escribir, resolver acertijos, jugar ajedrez o cambiar rutinas diarias.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q51-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 12: Cerebro y procesos psicológicos superiores -->
+            <div class="question-section">
+                <h2>12. Cerebro y procesos psicológicos superiores</h2>
+                <div class="question-item" id="q52-item" data-correct-answer="Principalmente la corteza cerebral, especialmente los lóbulos frontal, parietal, temporal y occipital, están asociados a estos procesos.">
+                    <p>52. ¿Qué áreas cerebrales están asociadas a los procesos psicológicos superiores?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q52" value="Se asocian exclusivamente con la función del cerebelo, el cual se encarga principalmente del equilibrio y la coordinación."> Se asocian exclusivamente con la función del cerebelo, una estructura que se encarga principalmente del equilibrio y la coordinación motora del cuerpo.</label>
+                        <label><input type="radio" name="q52" value="Principalmente la corteza cerebral, especialmente los lóbulos frontal, parietal, temporal y occipital, están asociados a estos procesos."> Principalmente la corteza cerebral, especialmente los lóbulos frontal, parietal, temporal y occipital, están asociados a estos procesos.</label>
+                        <label><input type="radio" name="q52" value="Únicamente el tronco encefálico desempeña un papel en ellos, controlando funciones vitales básicas como la respiración."> Únicamente el tronco encefálico desempeña un papel en ellos, siendo la estructura que controla funciones vitales básicas como la respiración y el latido cardíaco.</label>
+                        <label><input type="radio" name="q52" value="Solo la médula espinal tiene una conexión con estos procesos, transmitiendo información entre el cerebro y el resto del cuerpo."> Solo la médula espinal tiene una conexión con estos procesos, actuando como un puente para transmitir información entre el cerebro y el resto del cuerpo.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Principalmente la corteza cerebral, especialmente los lóbulos frontal, parietal, temporal y occipital, están asociados a estos procesos.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q52-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q53-item" data-correct-answer="Sus funciones principales incluyen planificación, toma de decisiones, control inhibitorio, memoria de trabajo, atención, personalidad y producción del lenguaje (Área de Broca).">
+                    <p>53. Funciones principales del lóbulo frontal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q53" value="Se encarga primordialmente del procesamiento e interpretación de la información visual que proviene de los ojos."> Se encarga primordialmente del procesamiento e interpretación de la información visual que proviene de los ojos y de la formación de imágenes.</label>
+                        <label><input type="radio" name="q53" value="Sus funciones incluyen la audición y el almacenamiento de la memoria a largo plazo, en relación con los recuerdos permanentes."> Sus funciones incluyen la audición, que es la percepción de sonidos, y el almacenamiento de la memoria a largo plazo, en relación con los recuerdos permanentes.</label>
+                        <label><input type="radio" name="q53" value="Sus funciones principales incluyen planificación, toma de decisiones, control inhibitorio, memoria de trabajo, atención, personalidad y producción del lenguaje (Área de Broca)."> Sus funciones principales incluyen planificación, toma de decisiones, control inhibitorio, memoria de trabajo, atención, personalidad y producción del lenguaje (Área de Broca).</label>
+                        <label><input type="radio" name="q53" value="Es el responsable principal del equilibrio corporal y la coordinación motora fina, permitiendo movimientos precisos."> Es el responsable principal del equilibrio corporal y la coordinación motora fina, lo que permite realizar movimientos precisos y coordinados.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Sus funciones principales incluyen planificación, toma de decisiones, control inhibitorio, memoria de trabajo, atención, personalidad y producción del lenguaje (Área de Broca).</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q53-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q54-item" data-correct-answer="Las funciones principales del lóbulo parietal abarcan la integración sensorial, la conciencia espacial, la atención, el cálculo y la comprensión del lenguaje.">
+                    <p>54. Funciones principales del lóbulo parietal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q54" value="Se encarga primordialmente de la producción y articulación del lenguaje verbal, permitiendo la comunicación hablada."> Se encarga primordialmente de la producción y articulación del lenguaje verbal, lo que posibilita la comunicación hablada y la expresión oral.</label>
+                        <label><input type="radio" name="q54" value="Su función principal se centra en el procesamiento y la regulación de las emociones, como el miedo o la alegría."> Su función principal se centra en el procesamiento y la regulación de las emociones, incluyendo sentimientos como el miedo, la alegría o la tristeza.</label>
+                        <label><input type="radio" name="q54" value="Las funciones principales del lóbulo parietal abarcan la integración sensorial, la conciencia espacial, la atención, el cálculo y la comprensión del lenguaje."> Las funciones principales del lóbulo parietal abarcan la integración sensorial, la conciencia espacial, la atención, el cálculo y la comprensión del lenguaje.</label>
+                        <label><input type="radio" name="q54" value="Controla de forma autónoma las funciones vitales como el ritmo de la respiración y el latido cardíaco, sin intervención consciente."> Controla de forma autónoma las funciones vitales como el ritmo de la respiración y el latido cardíaco, sin requerir intervención consciente del individuo.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Las funciones principales del lóbulo parietal abarcan la integración sensorial, la conciencia espacial, la atención, el cálculo y la comprensión del lenguaje.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q54-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q55-item" data-correct-answer="Sus funciones principales incluyen la audición, la comprensión del lenguaje (Área de Wernicke), la memoria (hipocampo), y el reconocimiento de objetos y emociones.">
+                    <p>55. Funciones principales del lóbulo temporal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q55" value="Se encarga principalmente de la planificación y ejecución de los movimientos motores del cuerpo, de forma coordinada."> Se encarga principalmente de la planificación y ejecución de los movimientos motores del cuerpo, asegurando que estos sean coordinados y precisos.</label>
+                        <label><input type="radio" name="q55" value="Su función primordial es el procesamiento e interpretación de la información visual que se recibe de los ojos."> Su función primordial es el procesamiento e interpretación de la información visual que se recibe de los ojos, formando imágenes mentales.</label>
+                        <label><input type="radio" name="q55" value="Sus funciones principales incluyen la audición, la comprensión del lenguaje (Área de Wernicke), la memoria (hipocampo), y el reconocimiento de objetos y emociones."> Sus funciones principales incluyen la audición, la comprensión del lenguaje (Área de Wernicke), la memoria (hipocampo), y el reconocimiento de objetos y emociones.</label>
+                        <label><input type="radio" name="q55" value="Es el área cerebral responsable del control del equilibrio y la postura corporal, lo cual es vital para la locomoción."> Es el área cerebral responsable del control del equilibrio y la postura corporal, una función vital para la locomoción y el movimiento.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Sus funciones principales incluyen la audición, la comprensión del lenguaje (Área de Wernicke), la memoria (hipocampo), y el reconocimiento de objetos y emociones.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q55-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q56-item" data-correct-answer="La función principal del lóbulo occipital es el procesamiento y la interpretación detallada de toda la información visual que recibimos.">
+                    <p>56. Funciones principales del lóbulo occipital:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q56" value="Es el responsable principal del control y la regulación de las emociones humanas, como la alegría, la tristeza o la ira."> Es el responsable principal del control y la regulación de las emociones humanas, incluyendo sentimientos como la alegría, la tristeza o la ira.</label>
+                        <label><input type="radio" name="q56" value="La función principal del lóbulo occipital es el procesamiento y la interpretación detallada de toda la información visual que recibimos."> La función principal del lóbulo occipital es el procesamiento y la interpretación detallada de toda la información visual que recibimos.</label>
+                        <label><input type="radio" name="q56" value="Se encarga de la producción y articulación del lenguaje hablado, permitiendo la comunicación verbal."> Se encarga de la producción y articulación del lenguaje hablado, lo que posibilita la comunicación verbal y la expresión oral de ideas.</label>
+                        <label><input type="radio" name="q56" value="Su función se limita a la gestión y el mantenimiento de la memoria de trabajo, procesando información temporalmente."> Su función se limita a la gestión y el mantenimiento de la memoria de trabajo, donde se procesa la información de forma temporal.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: La función principal del lóbulo occipital es el procesamiento y la interpretación detallada de toda la información visual que recibimos.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q56-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q57-item" data-correct-answer="Otras estructuras importantes incluyen el Tálamo (relevo sensorial y motor), el Sistema Límbico (emociones y memoria, con amígdala e hipocampo) y el Cerebelo (movimiento, equilibrio, atención, lenguaje y memoria de trabajo).">
+                    <p>57. Otras estructuras importantes para procesos superiores:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q57" value="Solo el tronco encefálico desempeña funciones relevantes en estos procesos, controlando funciones vitales básicas."> Solo el tronco encefálico desempeña funciones relevantes en estos procesos, siendo el centro de control de funciones vitales básicas como la respiración.</label>
+                        <label><input type="radio" name="q57" value="Otras estructuras importantes incluyen el Tálamo (relevo sensorial y motor), el Sistema Límbico (emociones y memoria, con amígdala e hipocampo) y el Cerebelo (movimiento, equilibrio, atención, lenguaje y memoria de trabajo)."> Otras estructuras importantes incluyen el Tálamo (relevo sensorial y motor), el Sistema Límbico (emociones y memoria, con amígdala e hipocampo) y el Cerebelo (movimiento, equilibrio, atención, lenguaje y memoria de trabajo).</label>
+                        <label><input type="radio" name="q57" value="Se limitan a la médula espinal como la única estructura adicional, transmitiendo señales nerviosas."> Se limitan a la médula espinal como la única estructura adicional, que se encarga de transmitir señales nerviosas entre el cerebro y el cuerpo.</label>
+                        <label><input type="radio" name="q57" value="El bulbo raquídeo es la única estructura adicional que interviene en estos procesos, regulando funciones autónomas."> El bulbo raquídeo es la única estructura adicional que interviene en estos procesos, encargado de regular funciones autónomas como el ritmo cardíaco y la presión arterial.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Otras estructuras importantes incluyen el Tálamo (relevo sensorial y motor), el Sistema Límbico (emociones y memoria, con amígdala e hipocampo) y el Cerebelo (movimiento, equilibrio, atención, lenguaje y memoria de trabajo).</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q57-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 13: Actividades prácticas para estimular cada inteligencia (según Gardner) -->
+            <div class="question-section">
+                <h2>13. Actividades prácticas para estimular cada inteligencia (según Gardner)</h2>
+                <div class="question-item" id="q58-item" data-correct-answer="Actividades para estimular la inteligencia lógico-matemática incluyen resolver problemas complejos, acertijos, realizar cálculo mental o aprender programación.">
+                    <p>58. Actividad para estimular la inteligencia lógico-matemática:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q58" value="La escritura creativa de un cuento o una narración literaria con personajes complejos y una trama elaborada."> La escritura creativa de un cuento o una narración literaria con personajes complejos y una trama elaborada, fomentando la imaginación.</label>
+                        <label><input type="radio" name="q58" value="La práctica de pintar un cuadro utilizando diferentes técnicas y colores, expresando creatividad artística."> La práctica de pintar un cuadro utilizando diferentes técnicas y colores, lo que permite expresar la creatividad artística y la visión personal.</label>
+                        <label><input type="radio" name="q58" value="Actividades para estimular la inteligencia lógico-matemática incluyen resolver problemas complejos, acertijos, realizar cálculo mental o aprender programación."> Actividades para estimular la inteligencia lógico-matemática incluyen resolver problemas complejos, acertijos, realizar cálculo mental o aprender programación.</label>
+                        <label><input type="radio" name="q58" value="La destreza para interpretar y tocar un instrumento musical como la guitarra, demostrando habilidades musicales."> La destreza para interpretar y tocar un instrumento musical como la guitarra, lo que demuestra habilidades musicales y un sentido del ritmo.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Actividades para estimular la inteligencia lógico-matemática incluyen resolver problemas complejos, acertijos, realizar cálculo mental o aprender programación.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q58-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q59-item" data-correct-answer="Actividades para estimular la inteligencia espacial-visual son dibujar, modelar, diseñar, armar rompecabezas complejos o interpretar mapas.">
+                    <p>59. Actividad para estimular la inteligencia espacial-visual:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q59" value="Participar activamente en un debate o discusión sobre temas sociales importantes, argumentando y persuadiendo."> Participar activamente en un debate o discusión sobre temas sociales importantes, donde se argumenta y persuade a otros con ideas claras.</label>
+                        <label><input type="radio" name="q59" value="Realizar ejercicio físico intenso y mantener una rutina de entrenamiento constante, para mejorar la salud corporal."> Realizar ejercicio físico intenso y mantener una rutina de entrenamiento constante, con el fin de mejorar la salud corporal y el bienestar físico.</label>
+                        <label><input type="radio" name="q59" value="Actividades para estimular la inteligencia espacial-visual son dibujar, modelar, diseñar, armar rompecabezas complejos o interpretar mapas."> Actividades para estimular la inteligencia espacial-visual son dibujar, modelar, diseñar, armar rompecabezas complejos o interpretar mapas.</label>
+                        <label><input type="radio" name="q59" value="La práctica de la meditación y la atención plena para la relajación mental y el autoconocimiento profundo."> La práctica de la meditación y la atención plena, buscando la relajación mental y un autoconocimiento profundo del propio ser.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Actividades para estimular la inteligencia espacial-visual son dibujar, modelar, diseñar, armar rompecabezas complejos o interpretar mapas.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q59-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q60-item" data-correct-answer="Actividades para estimular la inteligencia lingüística-verbal incluyen debatir, memorizar textos, escribir diarios o blogs, y jugar con palabras.">
+                    <p>60. Actividad para estimular la inteligencia lingüística-verbal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q60" value="La resolución de ecuaciones matemáticas complejas o problemas algebraicos, utilizando fórmulas y operaciones."> La resolución de ecuaciones matemáticas complejas o problemas algebraicos, aplicando fórmulas y operaciones lógicas para encontrar soluciones.</label>
+                        <label><input type="radio" name="q60" value="La habilidad de construir muebles utilizando herramientas y planos detallados, mostrando destreza manual y precisión."> La habilidad de construir muebles utilizando herramientas y planos detallados, lo cual demuestra una gran destreza manual y precisión en el trabajo.</label>
+                        <label><input type="radio" name="q60" value="Actividades para estimular la inteligencia lingüística-verbal incluyen debatir, memorizar textos, escribir diarios o blogs, y jugar con palabras."> Actividades para estimular la inteligencia lingüística-verbal incluyen debatir, memorizar textos, escribir diarios o blogs, y jugar con palabras.</label>
+                        <label><input type="radio" name="q60" value="La acción de escuchar diferentes géneros de música de forma pasiva, sin analizar su estructura o composición."> La acción de escuchar diferentes géneros de música de forma pasiva, sin prestar atención a su estructura, armonía o composición.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Actividades para estimular la inteligencia lingüística-verbal incluyen debatir, memorizar textos, escribir diarios o blogs, y jugar con palabras.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q60-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q61-item" data-correct-answer="Actividades para estimular la inteligencia musical-auditiva son aprender a tocar un instrumento, analizar música en profundidad, cantar o componer.">
+                    <p>61. Actividad para estimular la inteligencia musical-auditiva:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q61" value="La práctica de deportes de equipo como el baloncesto, que requiere coordinación física y estrategia."> La práctica de deportes de equipo como el baloncesto, donde se requiere coordinación física, agilidad y una estrategia de juego en conjunto.</label>
+                        <label><input type="radio" name="q61" value="El estudio de eventos y períodos históricos, analizando causas y consecuencias de los acontecimientos pasados."> El estudio de eventos y períodos históricos, analizando sus causas y consecuencias para comprender el desarrollo de las sociedades.</label>
+                        <label><input type="radio" name="q61" value="Actividades para estimular la inteligencia musical-auditiva son aprender a tocar un instrumento, analizar música en profundidad, cantar o componer."> Actividades para estimular la inteligencia musical-auditiva son aprender a tocar un instrumento, analizar música en profundidad, cantar o componer.</label>
+                        <label><input type="radio" name="q61" value="La planificación y organización detallada de un evento social o profesional, gestionando recursos y equipos."> La planificación y organización detallada de un evento social o profesional, lo que implica gestionar recursos, personal y cronogramas.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Actividades para estimular la inteligencia musical-auditiva son aprender a tocar un instrumento, analizar música en profundidad, cantar o componer.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q61-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q62-item" data-correct-answer="Actividades para estimular la inteligencia corporal-kinestésica son practicar deportes, bailar, yoga o realizar manualidades.">
+                    <p>62. Actividad para estimular la inteligencia corporal-kinestésica:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q62" value="La lectura de textos filosóficos complejos y abstractos, que requiere un pensamiento crítico y reflexivo."> La lectura de textos filosóficos complejos y abstractos, lo que demanda un pensamiento crítico y reflexivo sobre ideas profundas.</label>
+                        <label><input type="radio" name="q62" value="La resolución de un crucigrama o un rompecabezas de palabras, que implica habilidad lingüística y lógica."> La resolución de un crucigrama o un rompecabezas de palabras, lo cual implica habilidad lingüística y lógica para encontrar las soluciones correctas.</label>
+                        <label><input type="radio" name="q62" value="Actividades para estimular la inteligencia corporal-kinestésica son practicar deportes, bailar, yoga o realizar manualidades."> Actividades para estimular la inteligencia corporal-kinestésica son practicar deportes, bailar, yoga o realizar manualidades.</label>
+                        <label><input type="radio" name="q62" value="La escritura de un diario personal para reflexionar sobre experiencias, pensamientos y emociones diarias."> La escritura de un diario personal para reflexionar sobre experiencias, pensamientos y emociones diarias, cultivando la introspección.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Actividades para estimular la inteligencia corporal-kinestésica son practicar deportes, bailar, yoga o realizar manualidades.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q62-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q63-item" data-correct-answer="Actividades para estimular la inteligencia intrapersonal incluyen llevar un diario emocional, practicar la meditación o reflexionar sobre las metas personales.">
+                    <p>63. Actividad para estimular la inteligencia intrapersonal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q63" value="Participar como miembro activo en un equipo de debate o discusión, expresando ideas y escuchando a los demás."> Participar como miembro activo en un equipo de debate o discusión, expresando ideas y escuchando activamente las perspectivas de los demás.</label>
+                        <label><input type="radio" name="q63" value="Actividades para estimular la inteligencia intrapersonal incluyen llevar un diario emocional, practicar la meditación o reflexionar sobre las metas personales."> Actividades para estimular la inteligencia intrapersonal incluyen llevar un diario emocional, practicar la meditación o reflexionar sobre las metas personales.</label>
+                        <label><input type="radio" name="q63" value="La observación detallada de aves en su hábitat natural dentro de un parque, identificando especies y comportamientos."> La observación detallada de aves en su hábitat natural dentro de un parque, identificando diferentes especies y sus patrones de comportamiento.</label>
+                        <label><input type="radio" name="q63" value="La creación y programación de un videojuego desde cero, aplicando lógica y creatividad en el diseño."> La creación y programación de un videojuego desde cero, lo que implica aplicar lógica, creatividad y habilidades técnicas en el diseño.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Actividades para estimular la inteligencia intrapersonal incluyen llevar un diario emocional, practicar la meditación o reflexionar sobre las metas personales.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q63-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q64-item" data-correct-answer="Actividades para estimular la inteligencia interpersonal son participar en equipos, practicar la escucha activa o realizar voluntariado.">
+                    <p>64. Actividad para estimular la inteligencia interpersonal:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q64" value="La resolución de un rompecabezas visual muy complejo, que exige una gran capacidad de análisis espacial."> La resolución de un rompecabezas visual muy complejo, lo que exige una gran capacidad de análisis espacial y reconocimiento de patrones.</label>
+                        <label><input type="radio" name="q64" value="La habilidad de crear y dibujar un paisaje de forma artística, expresando la belleza de la naturaleza."> La habilidad de crear y dibujar un paisaje de forma artística, buscando capturar y expresar la belleza de la naturaleza.</label>
+                        <label><input type="radio" name="q64" value="Actividades para estimular la inteligencia interpersonal son participar en equipos, practicar la escucha activa o realizar voluntariado."> Actividades para estimular la inteligencia interpersonal son participar en equipos, practicar la escucha activa o realizar voluntariado.</label>
+                        <label><input type="radio" name="q64" value="El estudio y análisis de patrones climáticos a largo plazo, para predecir fenómenos meteorológicos."> El estudio y análisis de patrones climáticos a largo plazo, con el fin de predecir fenómenos meteorológicos y sus impactos.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Actividades para estimular la inteligencia interpersonal son participar en equipos, practicar la escucha activa o realizar voluntariado.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q64-item">Ver respuesta</button>
+                </div>
+
+                <div class="question-item" id="q65-item" data-correct-answer="Actividades para estimular la inteligencia naturalista son explorar la naturaleza, practicar jardinería o la observación de animales y plantas.">
+                    <p>65. Actividad para estimular la inteligencia naturalista:</p>
+                    <div class="options">
+                        <label><input type="radio" name="q65" value="Asistir a un concierto de música en vivo para disfrutar de la experiencia auditiva y las melodías."> Asistir a un concierto de música en vivo para disfrutar de la experiencia auditiva y sumergirse en las melodías interpretadas.</label>
+                        <label><input type="radio" name="q65" value="La redacción de un ensayo crítico sobre un tema de literatura, expresando opiniones y análisis."> La redacción de un ensayo crítico sobre un tema de literatura, expresando opiniones y análisis profundos de la obra.</label>
+                        <label><input type="radio" name="q65" value="Actividades para estimular la inteligencia naturalista son explorar la naturaleza, practicar jardinería o la observación de animales y plantas."> Actividades para estimular la inteligencia naturalista son explorar la naturaleza, practicar jardinería o la observación de animales y plantas.</label>
+                        <label><input type="radio" name="q65" value="La práctica regular de yoga para mejorar la flexibilidad y la calma mental, a través de posturas y respiración."> La práctica regular de yoga para mejorar la flexibilidad física y la calma mental, combinando posturas corporales y técnicas de respiración.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Actividades para estimular la inteligencia naturalista son explorar la naturaleza, practicar jardinería o la observación de animales y plantas.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q65-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 14: Hábitos saludables para la inteligencia general -->
+            <div class="question-section">
+                <h2>14. Hábitos saludables para la inteligencia general</h2>
+                <div class="question-item" id="q66-item" data-correct-answer="Hábitos que contribuyen a una inteligencia saludable son el ejercicio físico regular, una dieta balanceada, un buen sueño reparador, el manejo efectivo del estrés y la socialización activa.">
+                    <p>66. ¿Qué hábitos contribuyen a una inteligencia saludable?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q66" value="Ver televisión sin interrupción durante todo el día y consumir comida rápida frecuentemente, lo cual fomenta un estilo de vida sedentario."> Ver televisión sin interrupción durante todo el día y consumir comida rápida frecuentemente, lo cual fomenta un estilo de vida sedentario y poco saludable.</label>
+                        <label><input type="radio" name="q66" value="Aislarse de la sociedad por completo y tener patrones de sueño irregulares o insuficientes, lo que afecta negativamente el bienestar mental."> Aislarse de la sociedad por completo y tener patrones de sueño irregulares o insuficientes, lo que afecta negativamente el bienestar mental y emocional.</label>
+                        <label><input type="radio" name="q66" value="Hábitos que contribuyen a una inteligencia saludable son el ejercicio físico regular, una dieta balanceada, un buen sueño reparador, el manejo efectivo del estrés y la socialización activa."> Hábitos que contribuyen a una inteligencia saludable son el ejercicio físico regular, una dieta balanceada, un buen sueño reparador, el manejo efectivo del estrés y la socialización activa.</label>
+                        <label><input type="radio" name="q66" value="Dedicarse exclusivamente a estudiar de forma continua sin tomar ningún descanso, lo cual puede generar agotamiento mental."> Dedicarse exclusivamente a estudiar de forma continua sin tomar ningún descanso, lo cual puede generar un agotamiento mental significativo y contraproducente.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: Hábitos que contribuyen a una inteligencia saludable son el ejercicio físico regular, una dieta balanceada, un buen sueño reparador, el manejo efectivo del estrés y la socialización activa.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q66-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <!-- Sección 15: Relación entre inteligencias múltiples y funciones ejecutivas -->
+            <div class="question-section">
+                <h2>15. Relación entre inteligencias múltiples y funciones ejecutivas</h2>
+                <div class="question-item" id="q67-item" data-correct-answer="La planificación y organización de actividades para estimular todas las inteligencias favorece el desarrollo de funciones ejecutivas como la memoria de trabajo, flexibilidad, control inhibitorio, toma de decisiones y autorregulación.">
+                    <p>67. ¿Cómo se relacionan las inteligencias múltiples con las funciones ejecutivas?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q67" value="No existe ninguna relación entre ellas; son conceptos psicológicos completamente separados y sin interacción mutua."> No existe ninguna relación entre ellas; son conceptos psicológicos completamente separados y sin interacción mutua en el funcionamiento cognitivo.</label>
+                        <label><input type="radio" name="q67" value="Las funciones ejecutivas, en realidad, limitan e impiden el desarrollo de las diversas inteligencias, frenando su potencial."> Las funciones ejecutivas, en realidad, limitan e impiden el desarrollo de las diversas inteligencias, actuando como un factor que frena su potencial.</label>
+                        <label><input type="radio" name="q67" value="La planificación y organización de actividades para estimular todas las inteligencias favorece el desarrollo de funciones ejecutivas como la memoria de trabajo, flexibilidad, control inhibitorio, toma de decisiones y autorregulación."> La planificación y organización de actividades para estimular todas las inteligencias favorece el desarrollo de funciones ejecutivas como la memoria de trabajo, flexibilidad, control inhibitorio, toma de decisiones y autorregulación.</label>
+                        <label><input type="radio" name="q67" value="Esta relación solo se observa en personas diagnosticadas con Trastorno por Déficit de Atención e Hiperactividad (TDAH) como una característica única."> Esta relación solo se observa en personas diagnosticadas con Trastorno por Déficit de Atención e Hiperactividad (TDAH) y no es generalizable a otros individuos.</label>
+                    </div>
+                    <div class="feedback"></div>
+                    <div class="correct-answer-display">Respuesta correcta: La planificación y organización de actividades para estimular todas las inteligencias favorece el desarrollo de funciones ejecutivas como la memoria de trabajo, flexibilidad, control inhibitorio, toma de decisiones y autorregulación.</div>
+                    <button type="button" class="button show-answer-button" data-question-id="q67-item">Ver respuesta</button>
+                </div>
+            </div>
+
+            <button type="submit" class="button submit-button">Revisar Respuestas</button>
+        </form>
+
+        <div id="score-area">
+            <span class="label">Tu puntuación: </span><span class="value" id="score">0</span> / <span class="value" id="total-questions">0</span>
+            <div id="score-display"></div>
+        </div>
+
+        <div id="review-list-area">
+            <h2><i class="fas fa-exclamation-triangle"></i> Preguntas a Repasar</h2>
+            <ul id="incorrect-questions-list">
+                <!-- Las preguntas incorrectas se insertarán aquí por JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const QUIZ_STATE_KEY = 'quizState';
+            const EXPIRATION_TIME_MS = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
+
+            // Function to save quiz state to localStorage
+            function saveQuizState() {
+                const quizState = {
+                    answers: {},
+                    feedback: {},
+                    score: 0,
+                    timestamp: new Date().getTime(),
+                    questionClasses: {},
+                    buttonStates: {},
+                    scoreAreaVisible: false, // Default to false
+                    incorrectQuestions: [] // Store incorrect questions to rebuild review list
+                };
+
+                // Save selected answers
+                document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+                    quizState.answers[radio.name] = radio.value;
+                });
+
+                // Save feedback state and classes of questions
+                document.querySelectorAll('.question-item').forEach(item => {
+                    const itemId = item.id;
+                    const feedbackDiv = item.querySelector('.feedback');
+                    const showAnswerButton = item.querySelector('.show-answer-button');
+
+                    quizState.feedback[itemId] = {
+                        display: feedbackDiv.style.display,
+                        className: feedbackDiv.className,
+                        textContent: feedbackDiv.textContent,
+                        correctAnswerDisplay: item.querySelector('.correct-answer-display').style.display
+                    };
+                    // Only save 'correct-answered' or 'incorrect-answered' classes
+                    quizState.questionClasses[itemId] = Array.from(item.classList).filter(cls => cls.includes('-answered'));
+                    if (showAnswerButton) {
+                        quizState.buttonStates[itemId] = {
+                            disabled: showAnswerButton.disabled,
+                            textContent: showAnswerButton.textContent
+                        };
+                    }
+                });
+
+                // Check if score area is visible and save its state and content
+                const scoreArea = document.getElementById('score-area');
+                if (scoreArea.style.display === 'block') {
+                    quizState.scoreAreaVisible = true;
+                    quizState.score = parseInt(document.getElementById('score').textContent);
+                    // Re-collect incorrect questions for persistence
+                    const incorrectQuestionsListElements = document.querySelectorAll('#incorrect-questions-list li');
+                    quizState.incorrectQuestions = Array.from(incorrectQuestionsListElements).map(li => {
+                        const questionTextSpan = li.querySelector('.question-text');
+                        // Attempt to find the original question item by its text content
+                        const originalQuestionItem = Array.from(document.querySelectorAll('.question-item')).find(qItem =>
+                            qItem.querySelector('p').textContent === questionTextSpan.textContent
+                        );
+                        return {
+                            id: originalQuestionItem ? originalQuestionItem.id : '', // Store the ID to scroll back
+                            text: questionTextSpan.textContent
+                        };
+                    });
+                } else {
+                     quizState.scoreAreaVisible = false;
+                     quizState.incorrectQuestions = [];
+                }
+
+                localStorage.setItem(QUIZ_STATE_KEY, JSON.stringify(quizState));
+            }
+
+            // Function to load quiz state from localStorage
+            function loadQuizState() {
+                const savedState = localStorage.getItem(QUIZ_STATE_KEY);
+                if (savedState) {
+                    const quizState = JSON.parse(savedState);
+                    const currentTime = new Date().getTime();
+
+                    if (currentTime - quizState.timestamp < EXPIRATION_TIME_MS) {
+                        // Restore answers
+                        for (const name in quizState.answers) {
+                            const radio = document.querySelector(`input[name="${name}"][value="${quizState.answers[name]}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                            }
+                        }
+
+                        // Restore feedback and classes of questions
+                        for (const itemId in quizState.feedback) {
+                            const item = document.getElementById(itemId);
+                            if (item) {
+                                const feedbackDiv = item.querySelector('.feedback');
+                                const correctAnswerDisplay = item.querySelector('.correct-answer-display');
+                                const showAnswerButton = item.querySelector('.show-answer-button');
+
+                                feedbackDiv.style.display = quizState.feedback[itemId].display;
+                                feedbackDiv.className = quizState.feedback[itemId].className;
+                                feedbackDiv.textContent = quizState.feedback[itemId].textContent;
+                                correctAnswerDisplay.style.display = quizState.feedback[itemId].correctAnswerDisplay;
+
+                                // Restore question classes (correct-answered, incorrect-answered)
+                                item.classList.add(...quizState.questionClasses[itemId]);
+
+                                // Restore "Show Answer" button state
+                                if (showAnswerButton && quizState.buttonStates[itemId]) {
+                                    showAnswerButton.disabled = quizState.buttonStates[itemId].disabled;
+                                    showAnswerButton.textContent = quizState.buttonStates[itemId].textContent;
+                                }
+                            }
+                        }
+
+                        // Update score area if it was visible
+                        if (quizState.scoreAreaVisible) {
+                            document.getElementById('score').textContent = quizState.score;
+                            document.getElementById('total-questions').textContent = document.querySelectorAll('.question-item').length;
+                            document.getElementById('score-area').style.display = 'block';
+
+                            // Recalculate and display stars (since the score might not be explicitly saved)
+                            const currentScore = quizState.score;
+                            const totalQuestions = document.querySelectorAll('.question-item').length;
+                            const scoreDisplay = document.getElementById('score-display');
+                            scoreDisplay.innerHTML = ''; // Clear previous stars
+                            const maxStars = 5;
+                            const percentage = totalQuestions > 0 ? currentScore / totalQuestions : 0;
+                            const stars = Math.round(percentage * maxStars);
+
+                            for (let i = 0; i < maxStars; i++) {
+                                const starIcon = document.createElement('i');
+                                starIcon.classList.add('fas', 'fa-star', 'star');
+                                if (i >= stars) {
+                                    starIcon.classList.add('far'); // Empty star
+                                    starIcon.classList.remove('fas'); // Make sure it's not solid
+                                }
+                                scoreDisplay.appendChild(starIcon);
+                            }
+
+                            // Regenerate review list
+                            const reviewListArea = document.getElementById('review-list-area');
+                            const incorrectQuestionsList = document.getElementById('incorrect-questions-list');
+                            incorrectQuestionsList.innerHTML = '';
+                            if (quizState.incorrectQuestions && quizState.incorrectQuestions.length > 0) {
+                                reviewListArea.style.display = 'block';
+                                quizState.incorrectQuestions.forEach(q => {
+                                    const listItem = document.createElement('li');
+                                    listItem.innerHTML = `<span class="icon"><i class="fas fa-times-circle"></i></span> <span class="question-text">${q.text}</span>`;
+                                    listItem.addEventListener('click', () => {
+                                        const targetQuestion = document.getElementById(q.id);
+                                        if (targetQuestion) {
+                                            targetQuestion.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            targetQuestion.style.transition = 'background-color 0.5s ease';
+                                            targetQuestion.style.backgroundColor = '#fff3cd';
+                                            setTimeout(() => {
+                                                targetQuestion.style.backgroundColor = '';
+                                            }, 1500);
+                                        }
+                                    });
+                                    incorrectQuestionsList.appendChild(listItem);
+                                });
+                            } else {
+                                reviewListArea.style.display = 'none';
+                            }
+                        }
+                    } else {
+                        // If state expired, clear it
+                        localStorage.removeItem(QUIZ_STATE_KEY);
+                    }
+                }
+            }
+
+
+            // Function to review a single question
+            function reviewSingleQuestion(questionItem, isFinalReview = false) {
+                const questionName = questionItem.querySelector('input[type="radio"]').name;
+                const selectedOption = questionItem.querySelector(`input[name="${questionName}"]:checked`);
+                const correctAnswer = questionItem.dataset.correctAnswer.trim();
+                const feedbackDiv = questionItem.querySelector('.feedback');
+                const correctAnswerDisplay = questionItem.querySelector('.correct-answer-display');
+                const showAnswerButton = questionItem.querySelector('.show-answer-button');
+
+                // Reset previous feedback classes and hide correct answer message for re-evaluation
+                questionItem.classList.remove('correct-answered', 'incorrect-answered');
+                feedbackDiv.className = 'feedback';
+                feedbackDiv.style.display = 'block';
+                correctAnswerDisplay.style.display = 'none';
+
+                let isCorrect = false;
+
+                if (selectedOption) {
+                    if (selectedOption.value.trim() === correctAnswer) {
+                        isCorrect = true;
+                        feedbackDiv.classList.add('correct');
+                        feedbackDiv.textContent = '¡Correcto!';
+                        questionItem.classList.add('correct-answered');
+                    } else {
+                        feedbackDiv.classList.add('incorrect');
+                        feedbackDiv.textContent = 'Incorrecto.';
+                        questionItem.classList.add('incorrect-answered');
+                        correctAnswerDisplay.style.display = 'block';
+                    }
+                } else {
+                    feedbackDiv.classList.add('incorrect');
+                    feedbackDiv.textContent = 'No respondiste esta pregunta.';
+                    questionItem.classList.add('incorrect-answered');
+                    correctAnswerDisplay.style.display = 'block';
+                }
+
+                // Disable "Show Answer" button only if it's not the final review
+                if (showAnswerButton && !isFinalReview) {
+                    showAnswerButton.disabled = true;
+                    showAnswerButton.textContent = 'Revisado';
+                }
+
+                saveQuizState(); // Save state after each interaction
+                return isCorrect; // Return whether the question was correct or not
+            }
+
+            // Add event listeners to all radio buttons to save state on change
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', saveQuizState);
+            });
+
+            // Add event listeners to all "Show Answer" buttons
+            const showAnswerButtons = document.querySelectorAll('.show-answer-button');
+            showAnswerButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const questionId = this.dataset.questionId;
+                    const questionItem = document.getElementById(questionId);
+                    if (questionItem) {
+                        reviewSingleQuestion(questionItem, false); // Not final review
+                    }
+                });
+            });
+
+            // Event listener for "Review Answers" button (form submission)
+            document.getElementById('quiz-form').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent traditional form submission
+
+                let score = 0;
+                const questionItems = document.querySelectorAll('.question-item');
+                const totalQuestions = questionItems.length;
+                const incorrectQuestions = [];
+
+                questionItems.forEach(item => {
+                    const questionText = item.querySelector('p').textContent; // Get question text
+                    const isCorrect = reviewSingleQuestion(item, true); // This is the final review
+                    if (isCorrect) {
+                        score++;
+                    } else {
+                        incorrectQuestions.push({
+                            id: item.id,
+                            text: questionText
+                        });
+                    }
+                });
+
+                // Update and display final score
+                const scoreArea = document.getElementById('score-area');
+                document.getElementById('score').textContent = score;
+                document.getElementById('total-questions').textContent = totalQuestions;
+                scoreArea.style.display = 'block';
+
+                // Save score area visibility and content for state loading
+                const savedState = JSON.parse(localStorage.getItem(QUIZ_STATE_KEY)) || {};
+                savedState.scoreAreaVisible = true;
+                savedState.score = score;
+                savedState.incorrectQuestions = incorrectQuestions;
+                localStorage.setItem(QUIZ_STATE_KEY, JSON.stringify(savedState));
+
+
+                // Display score with stars
+                const scoreDisplay = document.getElementById('score-display');
+                scoreDisplay.innerHTML = ''; // Clear previous stars
+                const maxStars = 5;
+                const percentage = totalQuestions > 0 ? score / totalQuestions : 0;
+                const stars = Math.round(percentage * maxStars);
+
+                for (let i = 0; i < maxStars; i++) {
+                    const starIcon = document.createElement('i');
+                    starIcon.classList.add('fas', 'fa-star', 'star');
+                    if (i >= stars) {
+                        starIcon.classList.add('far'); // Empty star
+                        starIcon.classList.remove('fas'); // Ensure it's not solid
+                    }
+                    scoreDisplay.appendChild(starIcon);
+                }
+
+                // Generate review list
+                const reviewListArea = document.getElementById('review-list-area');
+                const incorrectQuestionsList = document.getElementById('incorrect-questions-list');
+                incorrectQuestionsList.innerHTML = ''; // Clear previous list
+
+                if (incorrectQuestions.length > 0) {
+                    reviewListArea.style.display = 'block';
+                    incorrectQuestions.forEach(q => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<span class="icon"><i class="fas fa-times-circle"></i></span> <span class="question-text">${q.text}</span>`;
+                        listItem.addEventListener('click', () => {
+                            const targetQuestion = document.getElementById(q.id);
+                            if (targetQuestion) {
+                                targetQuestion.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                // Optional: briefly highlight the question when scrolling
+                                targetQuestion.style.transition = 'background-color 0.5s ease';
+                                targetQuestion.style.backgroundColor = '#fff3cd'; // Light yellow to highlight
+                                setTimeout(() => {
+                                    targetQuestion.style.backgroundColor = '';
+                                }, 1500);
+                            }
+                        });
+                        incorrectQuestionsList.appendChild(listItem);
+                    });
+                } else {
+                    reviewListArea.style.display = 'none';
+                }
+            });
+
+            // Event listener for "Reset Quiz" button
+            document.getElementById('reset-quiz-button').addEventListener('click', function() {
+                localStorage.removeItem(QUIZ_STATE_KEY); // Clear saved state
+                location.reload(); // Reload the page
+            });
+
+            // Load quiz state on page load
+            loadQuizState();
+        });
+    </script>
+</body>
+</html>
